@@ -15,12 +15,14 @@ import 'default-passive-events'
 import qs from 'qs';
 Vue.prototype.qs=qs;
 import axios from 'axios'
-import {post,fetch,patch,put} from './utils/http'
+import {post,fetch,patch,put,deleteRequest} from './utils/http'
 //定义全局变量
+Vue.prototype.$axios=axios;
 Vue.prototype.$post=post;
 Vue.prototype.$fetch=fetch;
 Vue.prototype.$patch=patch;
 Vue.prototype.$put=put;
+Vue.prototype.$deleteRequest=deleteRequest;
 
 
 

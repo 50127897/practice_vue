@@ -42,6 +42,7 @@ axios.defaults.baseURL ='http://localhost:8088/';
 // )
 
 
+
 /**
  * 封装get方法
  * @param url
@@ -68,8 +69,9 @@ export function fetch(url,params={}){
  * 封装post请求
  * @param url
  * @param data
- * @returns {Promise}
- */
+ * @returns {Pro
+mise}
+*/
 
 export function post(url,data = {}){
     return new Promise((resolve,reject) => {
@@ -81,7 +83,6 @@ export function post(url,data = {}){
             })
     })
 }
-
 /**
  * 封装patch请求
  * @param url
@@ -110,6 +111,25 @@ export function patch(url,data = {}){
 export function put(url,data = {}){
     return new Promise((resolve,reject) => {
         axios.put(url,data)
+            .then(response => {
+                resolve(response.data);
+            },err => {
+                reject(err)
+            })
+    })
+}
+
+
+/**
+ * 封装delete请求
+ * @param url
+ * @param data
+ * @returns {Promise}
+ */
+
+export function deleteRequest(url,data = {}){
+    return new Promise((resolve,reject) => {
+        axios.delete(url,data)
             .then(response => {
                 resolve(response.data);
             },err => {

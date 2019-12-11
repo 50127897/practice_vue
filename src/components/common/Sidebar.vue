@@ -10,7 +10,7 @@
             unique-opened
             router
         >
-            <template v-for="item in items" v-if="item.type == member.type">
+            <template v-for="item in items" v-if="item.type == type">
                 <template v-if="item.subs">
                     <el-submenu :index="item.index" :key="item.index">
                         <template slot="title">
@@ -249,7 +249,7 @@ export default {
             this.collapse = msg;
             bus.$emit('collapse-content', msg);
         });
-        this.member = JSON.parse(localStorage.getItem('member'));
+        this.type = this.$cookies.get("type");
     }
 };
 </script>

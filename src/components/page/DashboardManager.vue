@@ -372,11 +372,11 @@
             }
         },
         created(){
-            this.handleListener();
+
             this.changeDate();
         },
         activated(){
-            this.handleListener();
+
         },
         deactivated(){
             window.removeEventListener('resize', this.renderChart);
@@ -402,55 +402,60 @@
                 });
                 this.dialogFormVisible = true;
             },
+            //通知详情，弹出通知模态框
             showAnnounceDetail(aid){
-                this.announceChild.forEach(e =>{
-                    if(e.aid == aid){
-                        this.detailChild = e.content;
+                let params = {
+                    aid: aid
+                }
+                this.$fetch("/announce",params).then(res =>{
+                    this.detailChild =res.data.content;
+                        this.detailVisible = true;
                     }
-                })
-                this.detailVisible = true;
+                )
             },
+            //加载通知信息
             loadAnnounce(){
-                this.$fetch('/announce/findAnnounce',this.AnnounceParams).then(res => {
-                    this.announceChild = res;
+                this.$fetch('/announce/',this.AnnounceParams).then(res => {
+                    this.announceChild = res.data;
                 });
             },
+            //删除通知
             handleDelete(aid) {
                 // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
-                })
-                    .then(() => {
-                        this.$fetch('/announce/deleteById?id='+aid).then(res => {
-                            if(res == 1) {
-                                this.$message.success('删除成功');
+                }).then(() => {
+                        this.$deleteRequest('/announce/'+aid).then(res => {
+                            if(res.resultCode === '0000') {
+                                this.$message.success(res.message);
                                 this.loadAnnounce();
-                            }else if(res==0){
-                                this.$message.warning('删除失败');
+                            }else{
+                                this.$message.warning(res.message);
                             }
                         });
 
                     })
                     .catch(() => {
-                        this.$message.warning('删除失败');
                     });
             },
+            //添加通知
             addAnnounce(){
                 console.log(this.newAnnounce);
-                this.$post('/announce/addAnnounce',this.qs.stringify(this.newAnnounce)).then(res => {
-                    if(res == 1) {
+                this.$post('/announce',this.qs.stringify(this.newAnnounce)).then(res => {
+                    if(res.resultCode === '0000') {
                         this.deliverVisible = false;
-                        this.$message.success('发布成功');
+                        this.$message.success(res.message);
+                        this.resetAnnounce();
                         this.loadAnnounce();
-                    }else if(res==0){
-                        this.$message.warning('发布失败');
+                    }else{
+                        this.$message.warning(res.message);
                     }
                 });
             },
             resetAnnounce(){
-                this.newAnnounce.content='';
-                this.newAnnounce.title='';
-                this.newAnnounce.type='';
+                Object.keys(this.newAnnounce).forEach(key => {
+                    this.newAnnounce[key] = '';
+                })
 
             },
             changeDate(){
@@ -460,22 +465,10 @@
                     item.name = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
                 })
             },
-            handleListener(){
-                bus.$on('collapse', this.handleBus);
-                // 调用renderChart方法对图表进行重新渲染
-                window.addEventListener('resize', this.renderChart)
-            },
-            handleBus(msg){
-                setTimeout(() => {
-                    this.renderChart()
-                }, 300);
-            },
-            renderChart(){
-                this.$refs.bar.renderChart();
-                this.$refs.line.renderChart();
-            }
+
         },
         created() {
+            //加载通知信息
             this.loadAnnounce();
             this.member = JSON.parse(localStorage.getItem("member"));
         },

@@ -3,7 +3,7 @@
         <div class="ms-login">
             <div class="ms-title"><span style="color: #222222">综合实践管理系统</span></div>
 
-            <el-form :model="member" :rules="rules" ref="login" label-width="0px" class="ms-content">
+            <el-form :model="params" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <!--日期-->
                 <el-form-item align="center">
                     <el-date-picker
@@ -16,7 +16,7 @@
                 </el-form-item>
                 <!--单选框 -->
                 <el-form-item align="center">
-                    <el-radio-group v-model="member.type" >
+                    <el-radio-group v-model="params.type" >
                         <el-radio :label="1">管理员</el-radio>
                         <el-radio :label="2">教师</el-radio>
                         <el-radio :label="3" >学生</el-radio>
@@ -26,7 +26,7 @@
 
 
                 <el-form-item prop="username">
-                    <el-input v-model="member.username" placeholder="学号">
+                    <el-input v-model="params.username" placeholder="学号">
                         <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
                     </el-input>
                 </el-form-item>
@@ -34,7 +34,7 @@
                     <el-input
                         type="password"
                         placeholder="密码"
-                        v-model="member.password"
+                        v-model="params.password"
                         @keyup.enter.native="submitForm()"
                     >
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
@@ -59,15 +59,21 @@ export default {
     data: function() {
         return {
             gettime:'',
-            member: {
+            params: {
+                username: '',
+                password: '',
+                type: 3,
+
+            },
+            loginParams: {
                 username: '',
                 password: '',
                 type: 3,
 
             },
             rules: {
-                username: [{ required: true, message: '请输入学号', trigger: 'blur' }],
-                password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+                    username: [{ required: true, message: '请输入学号', trigger: 'blur' }],
+                    password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
             },
         };
     },
@@ -94,31 +100,33 @@ export default {
         submitForm() {
             this.$refs.login.validate(valid => {
                 let sha256 = require("js-sha256").sha256//这里用的是require方法
-                this.member.password = sha256(this.member.password)//使用sha256密码加密
+                this.loginParams.password = sha256(this.params.password)//使用sha256密码加密
+                this.loginParams.username = this.params.username
+                this.loginParams.type = this.params.type
                 if (valid) {
-                    this.$post("/member/login",this.member).then(res=>{
-                            this.member = res;
-                            this.$cookies.set('name', this.member.name);
-                            this.$cookies.set('mid', this.member.mid); //登录成功后将token存储在cookie之中
-                            localStorage.setItem('member',JSON.stringify(this.member));
-                            this.$message.success('登录成功');
-                            if (this.member.type == 3) {
+                    this.$post("/member/login",this.loginParams).then(res=>{
+                        if(res.resultCode ==='0000'){
+                            this.$cookies.set('mid', res.data.mid); //登录成功后将token存储在cookie之中
+                            this.$cookies.set('type', res.data.type); //登录成功后将token存储在cookie之中
+                            this.$message.success(res.message);
+                            if (res.data.type == 3) {
                                 this.$router.push('/dashboard');
-                            }else if (this.member.type == 2) {
+                            }else if (res.data.type == 2) {
                                 this.$router.push('/dashboardTeacher');
-                            }else if (this.member.type == 1) {
+                            }else if (res.data.type == 1) {
                                 this.$router.push('/DashboardManager');
                             }
+                        }else{
+                            this.$message.error(res.message);
+                        }
+
                         }
                     ).catch(()=>{
-                            this.$message.error('登陆失败');
+                            this.$message.error('未找到该用户名');
                          return false;
                         }
 
                     ),
-
-
-
                     localStorage.setItem('ms_username', this.member.username);
 
                 } else {

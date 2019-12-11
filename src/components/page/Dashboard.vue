@@ -7,10 +7,10 @@
                     <div class="user-info">
                         <img src="../../assets/img/img.jpg" class="user-avator" alt="">
                         <div class="user-info-cont">
-                            <div class="user-info-name">{{student.name}}</div>
-                            <div v-if="student.type === 1">管理员</div>
-                            <div v-else-if="student.type === 2">教师</div>
-                            <div v-else-if="student.type === 3">学生</div>
+                            <div class="user-info-name">{{member.name}}</div>
+                            <div v-if="member.type === 1">管理员</div>
+                            <div v-else-if="member.type === 2">教师</div>
+                            <div v-else-if="member.type === 3">学生</div>
                         </div>
                         <el-tooltip class="item" effect="dark" content="修改个人信息" placement="bottom">
                             <el-button type="primary" icon="el-icon-edit" circle @click="showUpdateStudent" ></el-button>
@@ -18,31 +18,31 @@
 
                     </div>
                         <div class="user-info-list" >
-                            学号：&emsp;&emsp;<span>{{student.username}}</span>
+                            学号：&emsp;&emsp;<span>{{member.userName}}</span>
                         </div>
                         <div class="user-info-list" >
-                            学院：&emsp;&emsp;<span>{{student.college}}</span>
+                            学院：&emsp;&emsp;<span>{{member.college}}</span>
                         </div>
                         <div class="user-info-list" >
-                            专业：&emsp;&emsp;<span>{{student.major}}</span>
+                            专业：&emsp;&emsp;<span>{{member.major}}</span>
                         </div>
                         <div class="user-info-list" >
-                            年级：&emsp;&emsp;<span>{{student.grade}}</span>
+                            年级：&emsp;&emsp;<span>{{member.grade}}</span>
                         </div>
                         <div class="user-info-list" >
-                            班级：&emsp;&emsp;<span>{{student.classes}}</span>
+                            班级：&emsp;&emsp;<span>{{member.classes}}</span>
                         </div>
                         <div class="user-info-list" >
-                            联系地址：<span v-if="student.address != null">{{student.address}}</span>
-                            <span v-else-if="student.address == null" >（请补充）</span>
+                            联系地址：<span v-if="member.address != null">{{member.address}}</span>
+                            <span v-else-if="member.address == null" >（请补充）</span>
                         </div>
                         <div class="user-info-list" >
-                            联系电话：<span v-if="student.phone != null">{{student.phone}}</span>
-                            <span v-else-if="student.phone == null" >（请补充）</span>
+                            联系电话：<span v-if="member.phone != null">{{member.phone}}</span>
+                            <span v-else-if="member.phone == null" >（请补充）</span>
                         </div>
                         <div class="user-info-list" >
-                            电子邮箱：<span v-if="student.email != null">{{student.email}}</span>
-                            <span v-else-if="student.email == null" >（请补充）</span>
+                            电子邮箱：<span v-if="member.email != null">{{member.email}}</span>
+                            <span v-else-if="member.email == null" >（请补充）</span>
                         </div>
                 </el-card>
             </el-col>
@@ -174,9 +174,7 @@
         props: {
             announce: [{
                 aid: Object,
-                type: Object,
                 title: Object,
-                content: Object,
                 time: Object,
             }
 
@@ -274,11 +272,10 @@
                 }],
                 dialogFormVisible: false,
                 formLabelWidth: '120px',
-                student:{
-                    mid:'',
+                member:{
                     name:'',
                     type: null,
-                    username:'',
+                    userName:'',
                     grade:'',
                     college:'',
                     major:'',
@@ -286,10 +283,6 @@
                     address:'',
                     phone:'',
                     email:'',
-                    selected:'',
-                    teacherid:'',
-                    projectid:'',
-                    projectname:'',
                 },
                 studentUpdate:{
 
@@ -322,11 +315,10 @@
             }
         },
         created(){
-            this.handleListener();
             this.changeDate();
         },
         activated(){
-            this.handleListener();
+
         },
         deactivated(){
             window.removeEventListener('resize', this.renderChart);
@@ -352,13 +344,16 @@
                 });
                 this.dialogFormVisible = true;
             },
+            //通知详情，弹出通知模态框
             showAnnounceDetail(aid){
-                this.announceChild.forEach(e =>{
-                    if(e.aid == aid){
-                        this.detailChild = e.content;
+                let params = {
+                    aid: aid
+                }
+                this.$fetch("/announce",params).then(res =>{
+                        this.detailChild =res.data.content;
+                        this.detailVisible = true;
                     }
-                })
-                this.detailVisible = true;
+                )
             },
             changeDate(){
                 const now = new Date().getTime();
@@ -367,26 +362,17 @@
                     item.name = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
                 })
             },
-            handleListener(){
-                bus.$on('collapse', this.handleBus);
-                // 调用renderChart方法对图表进行重新渲染
-                window.addEventListener('resize', this.renderChart)
-            },
-            handleBus(msg){
-                setTimeout(() => {
-                    this.renderChart()
-                }, 300);
-            },
-            renderChart(){
-                this.$refs.bar.renderChart();
-                this.$refs.line.renderChart();
-            }
         },
         created() {
-            this.$fetch('/announce/findAnnounce',this.AnnounceParams).then(res => {
-                this.announceChild = res;
+            //加载通知信息
+            this.$fetch('/announce/',this.AnnounceParams).then(res => {
+                this.announceChild = res.data;
             });
-            this.student = JSON.parse(localStorage.getItem("member"));
+            //加载用户信息
+            this.$fetch('/member/'+this.$cookies.get("mid")).then(res => {
+                this.member = res.data;
+                this.member.type = this.$cookies.get("type");
+            });
         },
     }
 

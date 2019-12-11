@@ -123,9 +123,7 @@
         props: {
             announce: [{
                 aid: Object,
-                type: Object,
                 title: Object,
-                content: Object,
                 time: Object,
             }
 
@@ -138,7 +136,7 @@
         data() {
             return {
                 AnnounceParams: {
-                    type: 1,
+                    type: 2,
                     title: '',
                 },
                 detailChild: this.detail,
@@ -304,13 +302,17 @@
                 });
                 this.dialogFormVisible = true;
             },
+            //通知详情，弹出通知模态框
             showAnnounceDetail(aid){
-                this.announceChild.forEach(e =>{
-                    if(e.aid == aid){
-                        this.detailChild = e.content;
+                let params = {
+                    aid: aid
+                }
+                this.$fetch("/announce",params).then(res =>{
+                        this.detailChild =res.data.content;
+                        this.detailVisible = true;
                     }
-                })
-                this.detailVisible = true;
+
+                )
             },
             changeDate(){
                 const now = new Date().getTime();
@@ -335,8 +337,8 @@
             }
         },
         created() {
-            this.$fetch('/announce/findAnnounce',this.AnnounceParams).then(res => {
-                this.announceChild = res;
+            this.$fetch('/announce/',this.AnnounceParams).then(res => {
+                this.announceChild = res.data;
             });
             this.member = JSON.parse(localStorage.getItem("member"));
         },
