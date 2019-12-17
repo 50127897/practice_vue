@@ -79,7 +79,7 @@
                                         <span v-else-if="scope.row.type==1">教师</span>
                                     </template>
                                 </el-table-column>
-                                <el-table-column width="100">
+                                <el-table-column width="150">
                                     <template slot-scope="scope" >
                                         <span>{{scope.row.time}}</span>
                                     </template>
@@ -95,21 +95,6 @@
                             </el-table>
                         </el-scrollbar>
                     </div>
-
-
-<!--                        <el-table :data="unread" :show-header="false" style="width: 100%">-->
-<!--                            <el-table-column>-->
-<!--                                <template slot-scope="scope" >-->
-<!--                                    <span class="message-title"  @click="detailVisible = true">{{scope.row.title}}</span>-->
-<!--                                </template>-->
-<!--                            </el-table-column>-->
-<!--                            <el-table-column width="80">-->
-<!--                                <el-button type="danger" @click="dialogFormVisible = false">删除</el-button>-->
-<!--                            </el-table-column>-->
-<!--                            <el-table-column prop="date" width="140"></el-table-column>-->
-
-<!--                        </el-table>-->
-
                 </el-card>
 
             </el-col>
@@ -258,14 +243,6 @@
 
                 ],
                 detailVisible: false,
-                unread: [{
-                    date: '2018-04-19 20:00:00',
-                    title: '【系统通知】该系统将于今晚凌晨2点到5点进行升级维护',
-
-                },{
-                    date: '2018-04-19 21:00:00',
-                    title: '今晚12点整发大红包，先到先得',
-                }],
                 grades: [{
                     value: '一年级',
                     label: '一年级'
@@ -323,10 +300,9 @@
                 dialogFormVisible: false,
                 formLabelWidth: '120px',
                 member:{
-                    mid:'',
                     name:'',
                     type: null,
-                    username:'',
+                    userName:'',
                     grade:'',
                     college:'',
                     major:'',
@@ -334,17 +310,12 @@
                     address:'',
                     phone:'',
                     email:'',
-                    selected:'',
-                    teacherid:'',
-                    projectid:'',
-                    projectname:'',
                 },
                 memberUpdate:{
-
                     mid:'',
                     name:'',
                     type: null,
-                    username:'',
+                    userName:'',
                     grade:'',
                     college:'',
                     major:'',
@@ -352,66 +323,54 @@
                     address:'',
                     phone:'',
                     email:'',
-                    selected:'',
-                    teacherid:'',
-                    projectid:'',
-                    projectname:'',
                 },
-                name: localStorage.getItem('ms_username'),
-
-
             }
         },
         components: {
-            Schart,
             quillEditor
         },
-        computed: {
-            role() {
-                return this.name === 'admin' ? '超级管理员' : '普通用户';
-            }
-        },
-        created(){
-
-            this.changeDate();
-        },
-        activated(){
-
-        },
-        deactivated(){
-            window.removeEventListener('resize', this.renderChart);
-            bus.$off('collapse', this.handleBus);
-        },
         methods: {
+            //更新用户信息
             updateMember(){
-                this.$post("/member/update",this.memberUpdate).then(res =>{
-                    if(res > 0) {
-                        Object.keys(this.memberUpdate).forEach(key => (this.member[key] = this.memberUpdate[key]));
-                        Object.keys(this.memberUpdate).forEach(key => (this.memberUpdate[key] = ''));
-                        this.$message.success("修改信息成功");
+                this.$put("/member",this.memberUpdate).then(res =>{
+                    if(res.resultCode === '0000') {
+                        this.loadMemberInfo();
+                        this.$message.success(res.message);
                         this.dialogFormVisible = false;
                     }else{
-                        this.$message.success("修改信息失败");
+                        this.$message.success(res.message);
                     }
+                }).catch(()=>{
+                    this.$message.error("参数错误");
                 });
 
             },
+            //打开更新模态框
             showUpdateMember(){
-                this.$fetch('/member/getInfo?mid='+this.$cookies.get("mid")).then(res => {
-                    this.memberUpdate = res;
+                this.$fetch('/member/'+this.$cookies.get("mid")).then(res => {
+                    this.memberUpdate = res.data;
+                    this.memberUpdate.mid = this.$cookies.get("mid");
+                    this.memberUpdate.type = this.$cookies.get("type");
                 });
                 this.dialogFormVisible = true;
             },
+            //加载用户信息
+            loadMemberInfo(){
+                this.$fetch('/member/'+this.$cookies.get("mid")).then(res => {
+
+                    this.member = res.data;
+
+                });
+                this.member.type = this.$cookies.get("type");
+            },
             //通知详情，弹出通知模态框
             showAnnounceDetail(aid){
-                let params = {
-                    aid: aid
-                }
-                this.$fetch("/announce",params).then(res =>{
-                    this.detailChild =res.data.content;
+                this.announceChild.forEach(announce=>{
+                    if (announce.aid === aid) {
+                        this.detailChild = announce.content;
                         this.detailVisible = true;
                     }
-                )
+                })
             },
             //加载通知信息
             loadAnnounce(){
@@ -458,25 +417,19 @@
                 })
 
             },
-            changeDate(){
-                const now = new Date().getTime();
-                this.data.forEach((item, index) => {
-                    const date = new Date(now - (6 - index) * 86400000);
-                    item.name = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
-                })
-            },
 
         },
         created() {
             //加载通知信息
             this.loadAnnounce();
-            this.member = JSON.parse(localStorage.getItem("member"));
+            //加载用户信息
+            this.loadMemberInfo();
         },
         watch:{
-            AnnounceParams: { // 监视pagination属性的变化
-                deep: true, // deep为true，会监视pagination的属性及属性中的对象属性变化
+            AnnounceParams: { // 监视AnnounceParams属性的变化
+                deep: true, // deep为true，会监视AnnounceParams的属性及属性中的对象属性变化
                     handler() {
-                    // 变化后的回调函数，这里我们再次调用getDataFromServer即可
+                    // 变化后的回调函数，这里我们再次调用loadAnnounce即可
                     this.loadAnnounce();
                 }
             },

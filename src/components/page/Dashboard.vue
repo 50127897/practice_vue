@@ -13,7 +13,7 @@
                             <div v-else-if="member.type === 3">学生</div>
                         </div>
                         <el-tooltip class="item" effect="dark" content="修改个人信息" placement="bottom">
-                            <el-button type="primary" icon="el-icon-edit" circle @click="showUpdateStudent" ></el-button>
+                            <el-button type="primary" icon="el-icon-edit" circle @click="showUpdateMember" ></el-button>
                         </el-tooltip>
 
                     </div>
@@ -97,18 +97,18 @@
 
         <!--修改个人信息模态框-->
         <el-dialog title="个人信息修改" :visible.sync="dialogFormVisible" center>
-            <el-form :model="studentUpdate">
+            <el-form :model="memberUpdate">
                 <el-form-item label="姓名" :label-width="formLabelWidth">
-                    <el-input v-model="studentUpdate.name" autocomplete="off" readonly></el-input>
+                    <el-input v-model="memberUpdate.name" autocomplete="off" readonly></el-input>
                 </el-form-item>
                 <el-form-item label="学号" :label-width="formLabelWidth">
-                    <el-input v-model="studentUpdate.username" autocomplete="off" readonly></el-input>
+                    <el-input v-model="memberUpdate.userName" autocomplete="off" readonly></el-input>
                 </el-form-item>
                 <el-form-item label="学院" :label-width="formLabelWidth">
-                    <el-input v-model="studentUpdate.college" autocomplete="off" readonly></el-input>
+                    <el-input v-model="memberUpdate.college" autocomplete="off" readonly></el-input>
                 </el-form-item>
                 <el-form-item label="专业" :label-width="formLabelWidth">
-                    <el-select v-model="studentUpdate.major" placeholder="请选择">
+                    <el-select v-model="memberUpdate.major" placeholder="请选择">
                         <el-option
                                 v-for="item in majors"
                                 :key="item.value"
@@ -118,7 +118,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="年级" :label-width="formLabelWidth">
-                    <el-select v-model="studentUpdate.grade" placeholder="请选择">
+                    <el-select v-model="memberUpdate.grade" placeholder="请选择">
                         <el-option
                                 v-for="item in grades"
                                 :key="item.value"
@@ -128,7 +128,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="班级" :label-width="formLabelWidth">
-                    <el-select v-model="studentUpdate.classes" placeholder="请选择">
+                    <el-select v-model="memberUpdate.classes" placeholder="请选择">
                         <el-option
                                 v-for="item in classes"
                                 :key="item.value"
@@ -138,17 +138,17 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="联系地址" :label-width="formLabelWidth">
-                    <el-input v-model="studentUpdate.address" autocomplete="off" ></el-input>
+                    <el-input v-model="memberUpdate.address" autocomplete="off" ></el-input>
                 </el-form-item>
                 <el-form-item label="联系电话" :label-width="formLabelWidth">
-                    <el-input v-model="studentUpdate.phone" autocomplete="off" ></el-input>
+                    <el-input v-model="memberUpdate.phone" autocomplete="off" ></el-input>
                 </el-form-item>
                 <el-form-item label="电子邮箱" :label-width="formLabelWidth">
-                    <el-input v-model="studentUpdate.email" autocomplete="off" ></el-input>
+                    <el-input v-model="memberUpdate.email" autocomplete="off" ></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="updateStudent">修改</el-button>
+                <el-button type="primary" @click="updateMember">修改</el-button>
                 <el-button type="danger" @click="dialogFormVisible = false">取 消</el-button>
             </div>
         </el-dialog>
@@ -157,9 +157,6 @@
         <!--通知模态框-->
         <el-dialog title="通知详情" :visible.sync="detailVisible">
             <div v-html="detailChild"></div>
-<!--            <textarea v-html="detailChild">-->
-<!--                {{detailChild}}-->
-<!--            </textarea>-->
 
         </el-dialog>
 
@@ -168,24 +165,22 @@
 </template>
 
 <script>
-    import Schart from 'vue-schart';
-    import bus from '../common/bus';
     export default {
         props: {
             announce: [{
                 aid: Object,
                 title: Object,
                 time: Object,
+                content: Object,
             }
-
             ],
             detail: '',
-
-
         },
+
         name: 'dashboard',
         data() {
             return {
+                name:'',
 
                 AnnounceParams: {
                     type: 2,
@@ -284,12 +279,11 @@
                     phone:'',
                     email:'',
                 },
-                studentUpdate:{
-
+                memberUpdate:{
                     mid:'',
                     name:'',
                     type: null,
-                    username:'',
+                    userName:'',
                     grade:'',
                     college:'',
                     major:'',
@@ -297,70 +291,61 @@
                     address:'',
                     phone:'',
                     email:'',
-                    selected:'',
-                    teacherid:'',
-                    projectid:'',
-                    projectname:'',
                 },
-                name: localStorage.getItem('ms_username'),
 
             }
         },
         components: {
-            Schart
-        },
-        computed: {
-            role() {
-                return this.name === 'admin' ? '超级管理员' : '普通用户';
-            }
-        },
-        created(){
-            this.changeDate();
-        },
-        activated(){
 
         },
-        deactivated(){
-            window.removeEventListener('resize', this.renderChart);
-            bus.$off('collapse', this.handleBus);
+        computed: {
+
+        },
+        created(){
+
         },
         methods: {
-            updateStudent(){
-                this.$post("/member/update",this.studentUpdate).then(res =>{
-                    if(res > 0) {
-                        Object.keys(this.studentUpdate).forEach(key => (this.student[key] = this.studentUpdate[key]));
-                        Object.keys(this.studentUpdate).forEach(key => (this.studentUpdate[key] = ''));
-                        this.$message.success("修改信息成功");
+            //更新用户信息
+            updateMember(){
+                this.$put("/member",this.memberUpdate).then(res =>{
+                    if(res.resultCode === '0000') {
+                        this.loadMemberInfo();
+                        this.$message.success(res.message);
                         this.dialogFormVisible = false;
                     }else{
-                        this.$message.success("修改信息失败");
+                        this.$message.success(res.message);
                     }
+                }).catch(()=>{
+                    this.$message.error("参数错误");
                 });
 
             },
-            showUpdateStudent(){
-                this.$fetch('/member/getInfo?mid='+this.$cookies.get("mid")).then(res => {
-                    this.studentUpdate = res;
+            //打开更新模态框
+            showUpdateMember(){
+                this.$fetch('/member/'+this.$cookies.get("mid")).then(res => {
+                    this.memberUpdate = res.data;
+                    this.memberUpdate.mid = this.$cookies.get("mid");
+                    this.memberUpdate.type = this.$cookies.get("type");
                 });
                 this.dialogFormVisible = true;
             },
             //通知详情，弹出通知模态框
             showAnnounceDetail(aid){
-                let params = {
-                    aid: aid
-                }
-                this.$fetch("/announce",params).then(res =>{
-                        this.detailChild =res.data.content;
+                this.announceChild.forEach(announce=>{
+                    if (announce.aid === aid) {
+                        this.detailChild = announce.content;
                         this.detailVisible = true;
                     }
-                )
-            },
-            changeDate(){
-                const now = new Date().getTime();
-                this.data.forEach((item, index) => {
-                    const date = new Date(now - (6 - index) * 86400000);
-                    item.name = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
                 })
+            },
+            //加载用户信息
+            loadMemberInfo(){
+                this.$fetch('/member/'+this.$cookies.get("mid")).then(res => {
+
+                    this.member = res.data;
+
+                });
+                this.member.type = this.$cookies.get("type");
             },
         },
         created() {
@@ -368,11 +353,7 @@
             this.$fetch('/announce/',this.AnnounceParams).then(res => {
                 this.announceChild = res.data;
             });
-            //加载用户信息
-            this.$fetch('/member/'+this.$cookies.get("mid")).then(res => {
-                this.member = res.data;
-                this.member.type = this.$cookies.get("type");
-            });
+            this.loadMemberInfo();
         },
     }
 

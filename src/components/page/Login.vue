@@ -25,8 +25,8 @@
 
 
 
-                <el-form-item prop="username">
-                    <el-input v-model="params.username" placeholder="学号">
+                <el-form-item prop="userName">
+                    <el-input v-model="params.userName" placeholder="学号">
                         <el-button slot="prepend" icon="el-icon-lx-people"></el-button>
                     </el-input>
                 </el-form-item>
@@ -60,20 +60,20 @@ export default {
         return {
             gettime:'',
             params: {
-                username: '',
+                userName: '',
                 password: '',
                 type: 3,
 
             },
             loginParams: {
-                username: '',
+                userName: '',
                 password: '',
                 type: 3,
 
             },
             rules: {
-                    username: [{ required: true, message: '请输入学号', trigger: 'blur' }],
-                    password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+                userName: [{ required: true, message: '请输入学号', trigger: 'blur' }],
+                password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
             },
         };
     },
@@ -101,14 +101,18 @@ export default {
             this.$refs.login.validate(valid => {
                 let sha256 = require("js-sha256").sha256//这里用的是require方法
                 this.loginParams.password = sha256(this.params.password)//使用sha256密码加密
-                this.loginParams.username = this.params.username
+                this.loginParams.userName = this.params.userName
                 this.loginParams.type = this.params.type
                 if (valid) {
                     this.$post("/member/login",this.loginParams).then(res=>{
+
                         if(res.resultCode ==='0000'){
-                            this.$cookies.set('mid', res.data.mid); //登录成功后将token存储在cookie之中
-                            this.$cookies.set('type', res.data.type); //登录成功后将token存储在cookie之中
+                            this.$stores.commit('set_token', res.data.token);//登录成功后将token存储在sessionStorage之中
+                            sessionStorage.setItem("token",res.data.token);
+                            this.$cookies.set('mid', res.data.mid); //登录成功后将mid存储在cookie之中
+                            this.$cookies.set('type', res.data.type); //登录成功后将type存储在cookie之中
                             this.$message.success(res.message);
+                            this.$axios.defaults.headers.common['x-auth-token'] = res.data.token;
                             if (res.data.type == 3) {
                                 this.$router.push('/dashboard');
                             }else if (res.data.type == 2) {
@@ -122,12 +126,12 @@ export default {
 
                         }
                     ).catch(()=>{
-                            this.$message.error('未找到该用户名');
+                            this.$message.error('登陆失败');
                          return false;
                         }
 
-                    ),
-                    localStorage.setItem('ms_username', this.member.username);
+                    )
+                    // localStorage.setItem('ms_username', this.member.username);
 
                 } else {
                     this.$message.error('请输入账号和密码');

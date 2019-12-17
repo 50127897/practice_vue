@@ -125,6 +125,7 @@
                 aid: Object,
                 title: Object,
                 time: Object,
+                content: Object,
             }
 
             ],
@@ -159,14 +160,7 @@
 
                 ],
                 detailVisible: false,
-                unread: [{
-                    date: '2018-04-19 20:00:00',
-                    title: '【系统通知】该系统将于今晚凌晨2点到5点进行升级维护',
 
-                },{
-                    date: '2018-04-19 21:00:00',
-                    title: '今晚12点整发大红包，先到先得',
-                }],
                 grades: [{
                     value: '一年级',
                     label: '一年级'
@@ -224,10 +218,9 @@
                 dialogFormVisible: false,
                 formLabelWidth: '120px',
                 member:{
-                    mid:'',
                     name:'',
                     type: null,
-                    username:'',
+                    userName:'',
                     grade:'',
                     college:'',
                     major:'',
@@ -235,17 +228,12 @@
                     address:'',
                     phone:'',
                     email:'',
-                    selected:'',
-                    teacherid:'',
-                    projectid:'',
-                    projectname:'',
                 },
                 memberUpdate:{
-
                     mid:'',
                     name:'',
                     type: null,
-                    username:'',
+                    userName:'',
                     grade:'',
                     college:'',
                     major:'',
@@ -253,94 +241,62 @@
                     address:'',
                     phone:'',
                     email:'',
-                    selected:'',
-                    teacherid:'',
-                    projectid:'',
-                    projectname:'',
                 },
-                name: localStorage.getItem('ms_username'),
 
 
             }
-        },
-        components: {
-            Schart
-        },
-        computed: {
-            role() {
-                return this.name === 'admin' ? '超级管理员' : '普通用户';
-            }
-        },
-        created(){
-            this.handleListener();
-            this.changeDate();
-        },
-        activated(){
-            this.handleListener();
-        },
-        deactivated(){
-            window.removeEventListener('resize', this.renderChart);
-            bus.$off('collapse', this.handleBus);
         },
         methods: {
+            //更新用户信息
             updateMember(){
-                this.$post("/member/update",this.memberUpdate).then(res =>{
-                    if(res > 0) {
-                        Object.keys(this.memberUpdate).forEach(key => (this.member[key] = this.memberUpdate[key]));
-                        Object.keys(this.memberUpdate).forEach(key => (this.memberUpdate[key] = ''));
-                        this.$message.success("修改信息成功");
+                this.$put("/member",this.memberUpdate).then(res =>{
+                    if(res.resultCode === '0000') {
+                        this.loadMemberInfo();
+                        this.$message.success(res.message);
                         this.dialogFormVisible = false;
                     }else{
-                        this.$message.success("修改信息失败");
+                        this.$message.success(res.message);
                     }
+                }).catch(()=>{
+                    this.$message.error("参数错误");
                 });
 
             },
+            //打开更新模态框
             showUpdateMember(){
-                this.$fetch('/member/getInfo?mid='+this.$cookies.get("mid")).then(res => {
-                    this.memberUpdate = res;
+                this.$fetch('/member/'+this.$cookies.get("mid")).then(res => {
+                    this.memberUpdate = res.data;
+                    this.memberUpdate.mid = this.$cookies.get("mid");
+                    this.memberUpdate.type = this.$cookies.get("type");
                 });
                 this.dialogFormVisible = true;
             },
+            //加载用户信息
+            loadMemberInfo(){
+                this.$fetch('/member/'+this.$cookies.get("mid")).then(res => {
+
+                    this.member = res.data;
+
+                });
+                this.member.type = this.$cookies.get("type");
+            },
             //通知详情，弹出通知模态框
             showAnnounceDetail(aid){
-                let params = {
-                    aid: aid
-                }
-                this.$fetch("/announce",params).then(res =>{
-                        this.detailChild =res.data.content;
+                this.announceChild.forEach(announce=>{
+                    if (announce.aid === aid) {
+                        this.detailChild = announce.content;
                         this.detailVisible = true;
                     }
-
-                )
-            },
-            changeDate(){
-                const now = new Date().getTime();
-                this.data.forEach((item, index) => {
-                    const date = new Date(now - (6 - index) * 86400000);
-                    item.name = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
                 })
             },
-            handleListener(){
-                bus.$on('collapse', this.handleBus);
-                // 调用renderChart方法对图表进行重新渲染
-                window.addEventListener('resize', this.renderChart)
-            },
-            handleBus(msg){
-                setTimeout(() => {
-                    this.renderChart()
-                }, 300);
-            },
-            renderChart(){
-                this.$refs.bar.renderChart();
-                this.$refs.line.renderChart();
-            }
         },
         created() {
+            //加载通知信息
             this.$fetch('/announce/',this.AnnounceParams).then(res => {
                 this.announceChild = res.data;
             });
-            this.member = JSON.parse(localStorage.getItem("member"));
+            //加载用户信息
+            this.loadMemberInfo();
         },
     }
 

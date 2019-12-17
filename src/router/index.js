@@ -17,105 +17,105 @@ export default new Router({
                 {
                     path: '/fileUpload-manager',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/fileUpload-manager.vue'),
-                    meta: { title: '文档管理-管理员' }
+                    meta: { title: '文档管理-管理员' ,requireAuth: true, type:1 }
                 },
                 {
                     path: '/fileUpload-teacher',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/fileUpload-teacher.vue'),
-                    meta: { title: '文档管理-教师' }
+                    meta: { title: '文档管理-教师' ,requireAuth: true, type:2}
                 },
                 {
                     path: '/manager-date',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/manager-date.vue'),
-                    meta: { title: '时间设置-管理员' }
+                    meta: { title: '时间设置-管理员' ,requireAuth: true , type:1}
                 },
                 {
                     path: '/DashboardManager',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/DashboardManager.vue'),
-                    meta: { title: '系统首页-管理员' }
+                    meta: { title: '系统首页-管理员' ,requireAuth: true,type:1}
                 },
                 {
                     path: '/dashboard',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/Dashboard.vue'),
-                    meta: { title: '系统首页' }
+                    meta: { title: '系统首页',requireAuth: true , type:3}
                 },
                 {
                     path: '/examine',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/examine.vue'),
-                    meta: { title: '课题审核' }
+                    meta: { title: '课题审核',requireAuth: true , type:1}
                 },
                 {
                     path: '/project',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/project.vue'),
-                    meta: { title: '查看课程' }
+                    meta: { title: '查看课程' ,requireAuth: true , type:1}
                 },
                 {
                     path: '/manage_student',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/manage_student.vue'),
-                    meta: { title: '学生情况' }
+                    meta: { title: '学生情况',requireAuth: true  , type:1}
                 },
                 {
                     path: '/MyProjectTeacher',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/MyProjectTeacher.vue'),
-                    meta: { title: '课题选择' }
+                    meta: { title: '我的课题' ,requireAuth: true , type:2}
                 },
                 {
                     path: '/dashboardTeacher',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/DashboardTeacher.vue'),
-                    meta: { title: '系统首页-教师' }
+                    meta: { title: '系统首页-教师',requireAuth: true , type:2}
                 },
                 {
                     path: '/chooseProject',
                     component: () => import(/* webpackChunkName: "dashboard" */ '../components/page/chooseProject.vue'),
-                    meta: { title: '课题选择' }
+                    meta: { title: '课题选择' ,requireAuth: true  , type:3}
                 },
                 {
                     path: '/icon',
                     component: () => import(/* webpackChunkName: "icon" */ '../components/page/Icon.vue'),
-                    meta: { title: '自定义图标' }
+                    meta: { title: '自定义图标' ,requireAuth: true}
                 },
                 {
                     path: '/result',
                     component: () => import(/* webpackChunkName: "table" */ '../components/page/result.vue'),
-                    meta: { title: '课题结果' }
+                    meta: { title: '课题结果' ,requireAuth: true , type:3}
                 },
                 {
                     path: '/fileUpload',
                     component: () => import(/* webpackChunkName: "table" */ '../components/page/fileUpload.vue'),
-                    meta: { title: '文档管理' }
+                    meta: { title: '文档管理' ,requireAuth: true , type:3}
                 },
                 {
                     path: '/table',
                     component: () => import(/* webpackChunkName: "table" */ '../components/page/BaseTable.vue'),
-                    meta: { title: '基础表格' }
+                    meta: { title: '基础表格' ,requireAuth: true}
                 },
                 {
                     path: '/tabs',
                     component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
-                    meta: { title: 'tab选项卡' }
+                    meta: { title: 'tab选项卡',requireAuth: true }
                 },
                 {
                     path: '/form',
                     component: () => import(/* webpackChunkName: "form" */ '../components/page/BaseForm.vue'),
-                    meta: { title: '基本表单' }
+                    meta: { title: '基本表单' ,requireAuth: true}
                 },
                 {
                     // 富文本编辑器组件
                     path: '/editor',
                     component: () => import(/* webpackChunkName: "editor" */ '../components/page/VueEditor.vue'),
-                    meta: { title: '富文本编辑器' }
+                    meta: { title: '富文本编辑器' ,requireAuth: true}
                 },
                 {
                     // markdown组件
                     path: '/markdown',
                     component: () => import(/* webpackChunkName: "markdown" */ '../components/page/Markdown.vue'),
-                    meta: { title: 'markdown编辑器' }
+                    meta: { title: 'markdown编辑器' ,requireAuth: true}
                 },
                 {
                     // 图片上传组件
                     path: '/upload',
                     component: () => import(/* webpackChunkName: "upload" */ '../components/page/Upload.vue'),
-                    meta: { title: '文件上传' }
+                    meta: { title: '文件上传' ,requireAuth: true}
                 },
                 {
                     // vue-schart组件
