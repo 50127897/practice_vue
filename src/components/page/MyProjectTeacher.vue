@@ -8,7 +8,7 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div class="handle-box"style="padding: 10px">
+<!--            <div class="handle-box"style="padding: 10px">-->
                 <el-row>
                     <el-button
                             type="primary"
@@ -20,13 +20,13 @@
                 </el-row>
 
 
-            </div>
-            <el-row>
-                <el-col :span="4.5" v-for="item in projects" style="padding: 8px">
-                    <el-card class="box-card" style="width: 280px">
-                        <div slot="header" class="clearfix">
-                            <span>{{item.pname}}&nbsp;
-                            </span>
+<!--            </div>-->
+            <el-row :gutter="18">
+                <el-col :span="3.9" v-for="item in projects"  style="padding: 8px">
+                    <el-card class="box-card" style="width: 280px;height: 200px" shadow="hover">
+<!--                        <div slot="header" class="clearfix" >-->
+                        <div slot="header" class="clearfix" >
+                            {{item.pname}}
 
                         </div>
                         <div  class="text item">
@@ -45,23 +45,11 @@
                             <el-button type="info" @click="" v-if="item.status==2" >审核中</el-button>
                             <el-button type="warning" @click="cancel(item.pid)" v-if="item.status==2" >撤回</el-button>
                             <el-button type="success" @click="publish(item.pid)" v-if="item.status==1">发布</el-button>
-                            <el-button type="danger" @click="deleteProject(item.pid)" v-if="item.status==1">删除</el-button>
+                            <el-button type="danger" @click="deleteProject(item)" v-if="item.status==1">删除</el-button>
                         </div>
-
-
                     </el-card>
                 </el-col>
             </el-row>
-<!--            <div class="pagination">-->
-<!--                <el-pagination-->
-<!--                        background-->
-<!--                        layout="total, prev, pager, next"-->
-<!--                        :current-page="query.pageIndex"-->
-<!--                        :page-size="query.pageSize"-->
-<!--                        :total="pageTotal"-->
-<!--                        @current-change="handlePageChange"-->
-<!--                ></el-pagination>-->
-<!--            </div>-->
         </div>
 
 
@@ -195,7 +183,7 @@
                     项目名称：&emsp;&emsp;<span>{{projectDemo.pname}}</span>
                 </div>
                 <div class="user-info-list" >
-                    指导老师：&emsp;&emsp;<span>{{projectDemo.teachername}}</span>
+                    指导老师：&emsp;&emsp;<span>{{projectDemo.teacherName}}</span>
                 </div>
                 <div class="user-info-list" >
                     需求人数：&emsp;&emsp;<span>{{projectDemo.member}}</span>
@@ -233,7 +221,7 @@
                 </el-form-item>
                 <el-form-item label="指导老师" :label-width="formLabelWidth">
                     <el-col :span="6">
-                        <el-input v-model="project.teachername"></el-input>
+                        <el-input v-model="project.teacherName"></el-input>
                     </el-col>
                 </el-form-item>
                 <el-form-item label="需求人数" :label-width="formLabelWidth">
@@ -302,19 +290,11 @@
 </template>
 
 <script>
-    import { fetchData } from '../../api/index';
     import 'quill/dist/quill.core.css';
     import 'quill/dist/quill.snow.css';
     import 'quill/dist/quill.bubble.css';
     import { quillEditor } from 'vue-quill-editor';
     export default {
-        name: 'basetable',
-        computed: {
-            username() {
-                let username = localStorage.getItem('ms_username');
-                return username ? username : this.name;
-            }
-        },
         props: {
             group: {
                 type: Object
@@ -322,20 +302,27 @@
         },
         data() {
             return {
+                ProjectReq:{
+                    pId:'',
+                    status:'',
+                    teacherId:'',
+                    rejectContent:'',
+                    pName:'',
+                    },
                 fileList: [{name: 'food.doc', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}],
                 editorOption: {
                     placeholder: '请输入通知内容'
                 },
                 projectDemo:{
                     pid:'',
-                    teacherid:'',
+                    teacherId:'',
                     pname:'',
-                    teachername:'',
+                    teacherName:'',
                     content:'',
                     member:'',
                     file:'',
                     status:'',
-                    isfull:'',
+                    isFull:'',
                     selected:'',
                     first:'',
                     second:'',
@@ -343,14 +330,14 @@
                 },
                 project:{
                     pid:'',
-                    teacherid:'',
+                    teacherId:'',
                     pname:'',
-                    teachername:'',
+                    teacherName:'',
                     content:'',
                     member:'',
                     file:'',
                     status:'',
-                    isfull:'',
+                    isFull:'',
                     selected:'',
                     first:'',
                     second:'',
@@ -447,34 +434,20 @@
                     third: '209',
                 },
                     projects :[{
-                        title:'综合实践管理系统',
-                        member:'5',
-                        selected:'2',
-                        type: 0,
-                    },{
-                        title:'综合实践管理系统',
-                        member:'5',
-                        selected:'2',
-                        type: 1,
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        member:'5',
-                        selected:'2',
-                        type: 2,
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        member:'5',
-                        selected:'2',
-                        type: 3,
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        member:'5',
-                        selected:'2',
-                        type: 3,
-                    },
+                        pid:'123',
+                        teacherId:'123',
+                        pname:'123',
+                        teacherName:'123',
+                        content:'123',
+                        member:'123',
+                        file:'123',
+                        status:'1',
+                        isFull:'1',
+                        selected:'123',
+                        first:'123',
+                        second:'123',
+                        third:'123',
+                    }
                 ],
                 query: {
                     address: '',
@@ -500,51 +473,102 @@
         },
 
         methods: {
-            deleteProject(pid){
+            deleteProject(item){
+                this.$deleteRequest("/project/"+item.pid).then(res=>{
 
+                    if(res.body.resultCode=='0000'){
+                        this.$message.success("删除成功");
+                        Object.keys(this.projects).forEach(key => {
+                            if(this.projects[key].pid === item.pid){
+                                this.projects.splice(this.projects.indexOf(item),1);
+                            }
+                        });
+
+                    }else{
+                        this.$message.error("删除失败");
+                    }
+                }).catch(
+                    reason => {
+                        this.$message.error(reason);
+                    }
+                )
             },
             publish(pid){
+                this.$put("/project/"+pid).then(res=>{
+                    if(res.body.resultCode=='0000'){
+                        this.$message.success("项目已提交管理员审查");
+                        Object.keys(this.projects).forEach(key => {
+                            if(this.projects[key].pid === pid){
+                                this.projects[key].status = 2;
+                            }
+                        });
 
+                    }else{
+                        this.$message.error("项目提交失败");
+                    }
+                }).catch(
+                    reason => {
+                        this.$message.error(reason);
+                    }
+                )
             },
             cancel(pid){
+                this.$put("/project/cancel/"+pid).then(res=>{
+                    if(res.body.resultCode=='0000'){
+                        this.$message.success("已撤回");
+                        Object.keys(this.projects).forEach(key => {
+                            if(this.projects[key].pid === pid){
+                                this.projects[key].status = 1;
+                            }
+                        });
 
+                    }else{
+                        this.$message.error("撤回失败");
+                    }
+                }).catch(
+                    reason => {
+                        this.$message.error(reason);
+                    }
+                )
             },
+            //加载项目数据
             loadData(){
-                let param = new URLSearchParams()
-                param.append('teacherid', this.$cookies.get("mid"));
-                this.$post("/project/QueryAllMyProject",param).then(res=>{
+                this.ProjectReq.teacherId = this.$cookies.get("mid");
+                this.$fetch("/project",this.ProjectReq).then(res=>{
                     this.projects = res;
                 })
             },
+            //查看项目详情
             showProjectDetail(pid){
                 Object.keys(this.projects).forEach(key => {
-                    if(this.projects[key].pid == pid){
+                    if(this.projects[key].pid === pid){
                         this.projectDemo = this.projects[key];
                     }
                 });
                 this.detailVisible=true;
             },
+            //重置创建项目的信息
             reset(){
                 Object.keys(this.project).forEach(key => (this.project[key] = ''));
-                this.project.teacherid = this.$cookies.get("mid");
-                this.project.teachername = this.$cookies.get("name");
+                this.project.teacherId = this.$cookies.get("mid");
+                this.project.teacherName = this.$cookies.get("name");
             },
+            //打开创建项目弹窗
             showCreateProject(){
-                this.project.teachername = this.$cookies.get("name");
+                this.project.teacherName = this.$cookies.get("name");
                 this.createVisible = true;
             },
+            //创建项目
             createProject(){
-                this.project.teacherid = this.$cookies.get("mid");
-                this.$post("/project/addProject",this.project).then(res =>{
-
-                    if(res > 0) {
-                        Object.keys(this.project).forEach(key => (this.project[key] = ''));
+                this.project.teacherId = this.$cookies.get("mid");
+                this.$post("/project",this.project).then(res =>{
+                    if(res.resultCode === "0000") {
+                        this.reset();
                         this.$message.success("创建项目成功");
                         this.createVisible = false;
                         this.loadData();
-
                     }else{
-                        this.$message.success("修改信息失败");
+                        this.$message.success("创建项目失败");
                     }
                 });
             },

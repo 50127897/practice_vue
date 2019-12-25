@@ -8,41 +8,42 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <div>
-                <el-radio-group v-model="radio1">
-                    <el-radio-button label="未审核"></el-radio-button>
-                    <el-radio-button label="已通过"></el-radio-button>
-                    <el-radio-button label="已驳回"></el-radio-button>
+            <div style="padding: 8px">
+                <el-radio-group v-model="ProjectReq.status">
+                    <el-radio-button  label="2">未审核</el-radio-button>
+                    <el-radio-button label="4">已通过</el-radio-button>
+                    <el-radio-button label="3">已驳回</el-radio-button>
                 </el-radio-group>
                 &nbsp;
-                <el-input v-model="query.name" placeholder="项目名称" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+                <el-input v-model="ProjectReq.pName" placeholder="项目名称" class="handle-input mr10"></el-input>
+                <el-button type="primary" icon="el-icon-search" @click="searchProject">搜索</el-button>
             </div>
-            <el-row>
-                <el-col :span="4" v-for="item in project" style="padding: 8px">
-                    <el-card class="box-card" >
+            <div style="height: 15px">
+            </div>
+            <el-row >
+                <el-col :span="0.1" v-for="item in projects" style="padding: 8px">
+                    <el-card class="box-card" style="width: 230px;height: 250px">
 
                         <div slot="header" class="clearfix">
-                            <span>{{item.title}}</span>&nbsp;
+                            <span>{{item.pname}}</span>&nbsp;
                         </div>
                         <div  class="text item">
-                            课题ID:{{item.id}}
+                            课题ID:{{item.pid}}
                         </div>
                         <div  class="text item">
-                            指导老师:{{item.teacher}}
+                            指导老师:{{item.teacherName}}
                         </div>
                         <div  class="text item">
                             需求人数:{{item.member}}
                         </div>
                         <div >
-                            <el-button type="primary" @click="detailVisible=true" >详情</el-button>
-                            <el-button type="primary" @click="" v-if="item.type == 0">通过</el-button>
-                            <el-button type="danger" @click="" v-if="item.type == 0">驳回</el-button>
-                            <el-button type="success" @click="" v-if="item.type == 1">已通过</el-button>
-                            <el-button type="danger" @click="" v-if="item.type == 2">已驳回</el-button>
+                            <el-button type="primary" @click="showDetail(item.pid)" >详情</el-button>
+                            <el-button type="primary" @click="passProject(item)" v-if="item.status == 2">通过</el-button>
+                            <el-button type="danger" @click="showReject(item)" v-if="item.status == 2">驳回</el-button>
+                            <el-button type="success" @click="" v-if="item.status == 4">已通过</el-button>
+                            <el-button type="danger" @click="" v-if="item.status == 3">已驳回</el-button>
 
                         </div>
-
 
                     </el-card>
                 </el-col>
@@ -50,11 +51,13 @@
             <div class="pagination">
                 <el-pagination
                         background
-                        layout="total, prev, pager, next"
-                        :current-page="query.pageIndex"
-                        :page-size="query.pageSize"
-                        :total="pageTotal"
-                        @current-change="handlePageChange"
+                        layout="total,sizes, prev, pager, next,jumper"
+                        :current-page="ProjectReq.current"
+                        :page-sizes="[3,8, 10, 12, 14]"
+                        :page-size="ProjectReq.size"
+                        :total="page.total"
+                        @current-change="currentChange"
+                        @size-change="sizeChange"
                 ></el-pagination>
             </div>
         </div>
@@ -112,154 +115,127 @@
             <div style="width: 400px">
             <el-form ref="form" :model="projectDemo" label-width="80px" style="padding: 30px;font-size:large">
                 <div class="user-info-list" >
-                    课题id：&emsp;&emsp;<span>{{projectDemo.id}}</span>
+                    课题id&emsp;&nbsp;：&emsp;&emsp;<span>{{projectDemo.pid}}</span>
                 </div>
                 <div class="user-info-list" >
-                    项目名称：&emsp;&emsp;<span>{{projectDemo.name}}</span>
+                    项目名称：&emsp;&emsp;<span>{{projectDemo.pname}}</span>
                 </div>
                 <div class="user-info-list" >
-                    指导老师：&emsp;&emsp;<span>{{projectDemo.teacher}}</span>
+                    指导老师：&emsp;&emsp;<span>{{projectDemo.teacherName}}</span>
                 </div>
                 <div class="user-info-list" >
                     需求人数：&emsp;&emsp;<span>{{projectDemo.member}}</span>
                 </div>
-                <div class="user-info-list" >
-                    第一志愿已选人数：&emsp;&emsp;<span>{{projectDemo.firstSelected}}</span>
-                </div>
-                <div class="user-info-list" >
-                    第二志愿已选人数：&emsp;&emsp;<span>{{projectDemo.secondSelected}}</span>
-                </div>
-                <div class="user-info-list" >
-                    第三志愿已选人数：&emsp;&emsp;<span>{{projectDemo.thirdSelected}}</span>
-                </div>
-
             </el-form>
             </div>
-
-            项目详情：<div> 各项目组制定项目计划，有步骤的完成项目内容并提交有关成果。项目实施过程中要求：</div>
-            <div>（一）每位学生每周必须参加一次工程实践课程小组学习，由指导老师到场指导。填写《教师指导记录》</div>
-            <div>（二）每位学生每周必须参加两次工程实践课程集体学习（讲座形式，由各指导老师和企业导师主讲）。填写《讲座考勤表》</div>
-            <div>（三）每位学生按照计划完成每周工作。填写《学生工作日志》</div>
-            <div>（四）每组有步骤的完成项目内容。需提交应用型成果及相应文档，如《规划说明书》、《软件需求分析说明书》、《软件设计说明书》、《软件测试说明书》、《推广实施说明书》、《资金预算表》、《资金执行计划表》、《用户手册》等。</div>
-            <div>（五）每位学生需撰写项目工程实践报告。实践报告要求书写规范、文字通顺、图表清晰，不得少于8000字，要求文字打印，统一格式，统一封面，装订成册。撰写《项目工程实践报告》</div>
-
+            <div v-html="projectDemo.content" style="padding: 20px"></div>
             <span slot="footer" class="dialog-footer">
-
-
                 <el-button @click="detailVisible = false">返 回</el-button>
+            </span>
+        </el-dialog>
+
+
+        <!-- 驳回项目弹出框 -->
+        <el-dialog title="项目详情" :visible.sync="rejectVisible" width="65%">
+
+            <div style="width: 400px">
+                <el-form ref="form2" :model="projectDemo" label-width="80px" style="padding: 30px;font-size:large">
+                    <div class="user-info-list" >
+                        课题id&emsp;&nbsp;：<span>{{projectDemo.pid}}</span>
+                    </div>
+                    <div class="user-info-list" >
+                        项目名称：&emsp;&emsp;<span>{{projectDemo.pname}}</span>
+                    </div>
+                    <div class="user-info-list" >
+                        指导老师：&emsp;&emsp;<span>{{projectDemo.teacherName}}</span>
+                    </div>
+                    <div class="user-info-list" >
+                        需求人数：&emsp;&emsp;<span>{{projectDemo.member}}</span>
+                    </div>
+                </el-form>
+            </div>
+            <div v-html="projectDemo.content" style="padding: 20px"></div>
+
+            <div style="padding: 20px">
+                <quill-editor v-model="ProjectRequest.rejectContent" :options="editorOption"></quill-editor>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="rejectProject(projectDemo.pid)">确认驳回</el-button>
+                <el-button @click="rejectVisible = false">返 回</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
-    import { fetchData } from '../../api/index';
+    import 'quill/dist/quill.core.css';
+    import 'quill/dist/quill.snow.css';
+    import 'quill/dist/quill.bubble.css';
+    import { quillEditor } from 'vue-quill-editor';
     export default {
         name: 'basetable',
         data() {
             return {
+                page:{
+                    pages:1,
+                    total:1,
+                },
+                editorOption:{
+                    placeholder: '驳回原因'
+                },
+                ProjectReq:{
+                    pid:'',
+                    status:'2',
+                    teacherid:'',
+                    rejectContent:'',
+                    pName:'',
+                    size: 3,
+                    current: 1,
+                },
+                ProjectRequest:{
+                    pid: '',
+                    status:'',
+                    teacherid:'',
+                    rejectContent:'',
+                    pName:'',
+                },
                 radio1:'未审核',
                 projectDemo:{
-                    id:'207',
-                    name:'综合实践管理系统',
-                    teacher:'高教授',
-                    member:'5',
-                    firstSelected:'7',
-                    secondSelected:'8',
-                    thirdSelected:'9',
+                    pid:'',
+                    teacherid:'',
+                    pname:'',
+                    teacherName:'',
+                    content:'',
+                    member:'',
+                    file:'',
+                    status:'',
+                    isFull:'',
+                    selected:'',
+                    first:'',
+                    second:'',
+                    third:'',
                 },
+                rejectVisible: false,
                 detailVisible: false,
                 formLabelWidth:'80px',
-                choosen:{
-                    first: '207',
-                    second: '208',
-                    third: '209',
-                },
-                    project :[{
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'0'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'0'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'0'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'1'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'2'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'2'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'0'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'0'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'0'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'0'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'0'
-                    },
-                    {
-                        title:'综合实践管理系统',
-                        id:'207',
-                        teacher: '李教授',
-                        member:'5',
-                        type:'0'
-                    },
-                ],
+
+                    projects:[
+                        {
+                            pid:'123',
+                            teacherid:'123',
+                            pname:'123',
+                            teacherName:'123',
+                            content:'123',
+                            member:'123',
+                            file:'123',
+                            status:'1',
+                            isFull:'1',
+                            selected:'123',
+                            first:'123',
+                            second:'123',
+                            third:'123',
+                        }
+                    ],
                 query: {
                     address: '',
                     name: '',
@@ -276,68 +252,147 @@
                 id: -1
             };
         },
+        components: {
+            quillEditor
+        },
         created() {
             this.getData();
         },
-        methods: {
-            showDetail(id){
-
-            },
-            // 获取 easy-mock 的模拟数据
-            getData() {
-                fetchData(this.query).then(res => {
-                    this.tableData = res.list;
-                    this.pageTotal = res.pageTotal || 50;
-                });
-            },
-            // 触发搜索按钮
-            handleSearch() {
-                this.$set(this.query, 'pageIndex', 1);
-                this.getData();
-            },
-            // 删除操作
-            handleDelete(index, row) {
-                // 二次确认删除
-                this.$confirm('确定要删除吗？', '提示', {
-                    type: 'warning'
-                })
-                    .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
-                    })
-                    .catch(() => {});
-            },
-            // 多选操作
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-            delAllSelection() {
-                const length = this.multipleSelection.length;
-                let str = '';
-                this.delList = this.delList.concat(this.multipleSelection);
-                for (let i = 0; i < length; i++) {
-                    str += this.multipleSelection[i].name + ' ';
+        watch: {
+            'ProjectReq.status': { // 监视pagination属性的变化
+                // deep: true, // deep为true，会监视pagination的属性及属性中的对象属性变化
+                handler() {
+                    this.initPage();
+                    // 变化后的回调函数，这里我们再次调用getDataFromServer即可
+                    this.getData();
                 }
-                this.$message.error(`删除了${str}`);
-                this.multipleSelection = [];
             },
-            // 编辑操作
-            handleEdit(index, row) {
-                this.idx = index;
-                this.form = row;
-                this.editVisible = true;
-            },
-            // 保存编辑
-            saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                this.$set(this.tableData, this.idx, this.form);
-            },
-            // 分页导航
-            handlePageChange(val) {
-                this.$set(this.query, 'pageIndex', val);
+
+        },
+        methods: {
+            searchProject(){
+                this.initPage();
+                // 变化后的回调函数，这里我们再次调用getDataFromServer即可
                 this.getData();
-            }
+            },
+            initPage(){
+                this.ProjectReq.current='';
+                this.page.pages='';
+                this.page.total='';
+            },
+            currentChange(val){
+                this.ProjectReq.current = val;
+                this.getData();
+            },
+            sizeChange(val){
+                this.ProjectReq.size = val;
+                this.getData();
+            },
+            passProject(item){
+                this.ProjectRequest.pid = item.pid;
+                this.ProjectRequest.status = 4;
+                this.$patch("/project",this.ProjectRequest).then(res=>{
+                    this.$message.success("项目审核通过")
+                    Object.keys(this.projects).forEach(key => {
+                        if(this.projects[key].pid === item.pid){
+                            this.projects[key].status = 4;
+                        }
+                    });
+                })
+            },
+            showReject(item){
+                Object.keys(this.projects).forEach(key => {
+                    if(this.projects[key].pid === item.pid){
+                        this.projectDemo = this.projects[key];
+                    }
+                });
+                this.rejectVisible=true
+            },
+            rejectProject(pid){
+                this.ProjectRequest.pid = pid;
+                this.ProjectRequest.status = 3 ;
+                this.$patch("/project",this.ProjectRequest).then(res=>{
+                    this.$message.success("已驳回项目");
+                    Object.keys(this.projects).forEach(key => {
+                        if(this.projects[key].pid === pid){
+                            this.projects[key].status = 3;
+                        }
+                    });
+                    this.rejectVisible = false;
+                })
+            },
+            showDetail(id){
+                Object.keys(this.projects).forEach(key => {
+                    if(this.projects[key].pid === id){
+                        this.projectDemo = this.projects[key];
+                    }
+                });
+                this.detailVisible=true
+            },
+            getData(){
+                this.$fetch("/project",this.ProjectReq).then(res=>{
+                    this.projects = res.records;
+                    this.page.total = res.total;
+                    this.page.pages = res.pages;
+                    this.ProjectReq.size = res.size;
+
+                })
+            },
+            // // 获取 easy-mock 的模拟数据
+            // getData() {
+            //     fetchData(this.query).then(res => {
+            //         this.tableData = res.list;
+            //         this.pageTotal = res.pageTotal || 50;
+            //     });
+            // },
+            // // 触发搜索按钮
+            // handleSearch() {
+            //     this.$set(this.query, 'pageIndex', 1);
+            //     this.getData();
+            // },
+            // // 删除操作
+            // handleDelete(index, row) {
+            //     // 二次确认删除
+            //     this.$confirm('确定要删除吗？', '提示', {
+            //         type: 'warning'
+            //     })
+            //         .then(() => {
+            //             this.$message.success('删除成功');
+            //             this.tableData.splice(index, 1);
+            //         })
+            //         .catch(() => {});
+            // },
+            // // 多选操作
+            // handleSelectionChange(val) {
+            //     this.multipleSelection = val;
+            // },
+            // delAllSelection() {
+            //     const length = this.multipleSelection.length;
+            //     let str = '';
+            //     this.delList = this.delList.concat(this.multipleSelection);
+            //     for (let i = 0; i < length; i++) {
+            //         str += this.multipleSelection[i].name + ' ';
+            //     }
+            //     this.$message.error(`删除了${str}`);
+            //     this.multipleSelection = [];
+            // },
+            // // 编辑操作
+            // handleEdit(index, row) {
+            //     this.idx = index;
+            //     this.form = row;
+            //     this.editVisible = true;
+            // },
+            // // 保存编辑
+            // saveEdit() {
+            //     this.editVisible = false;
+            //     this.$message.success(`修改第 ${this.idx + 1} 行成功`);
+            //     this.$set(this.tableData, this.idx, this.form);
+            // },
+            // // 分页导航
+            // handlePageChange(val) {
+            //     this.$set(this.query, 'pageIndex', val);
+            //     this.getData();
+            // }
         }
     };
 </script>

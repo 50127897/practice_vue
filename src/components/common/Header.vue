@@ -43,6 +43,7 @@
                         </a>
 <!--                        <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>-->
                         <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+<!--                        <el-dropdown-item @click="logout">退出登录</el-dropdown-item>-->
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
@@ -73,11 +74,15 @@ export default {
             //     localStorage.removeItem('ms_username');
             //     this.$router.push('/login');
             // } else
+
             if (command == 'logout') {
-                this.$cookies.remove("mid");
-                localStorage.clear();
-                this.$message.warning('请重新登陆');
-                this.$router.push('/login');
+                this.$patch("/member/logout").then(res=>{
+                    this.$cookies.remove("mid");
+                    sessionStorage.clear();
+                    this.$message.warning('请重新登陆');
+                    this.$router.push('/login');
+                })
+
             }
         },
         // 侧边栏折叠
