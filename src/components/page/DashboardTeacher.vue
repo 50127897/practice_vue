@@ -274,8 +274,8 @@
             //加载用户信息
             loadMemberInfo(){
                 this.$fetch('/member/'+this.$cookies.get("mid")).then(res => {
-
                     this.member = res.data;
+                    this.$cookies.set("name",res.data.name)
 
                 });
                 this.member.type = this.$cookies.get("type");

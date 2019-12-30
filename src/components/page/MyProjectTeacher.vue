@@ -8,7 +8,6 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-<!--            <div class="handle-box"style="padding: 10px">-->
                 <el-row>
                     <el-button
                             type="primary"
@@ -18,16 +17,15 @@
 
                     >创建课题</el-button>
                 </el-row>
-
-
-<!--            </div>-->
             <el-row :gutter="18">
                 <el-col :span="3.9" v-for="item in projects"  style="padding: 8px">
-                    <el-card class="box-card" style="width: 280px;height: 200px" shadow="hover">
+                    <el-card class="box-card" style="width: 280px;height: 240px" shadow="hover">
 <!--                        <div slot="header" class="clearfix" >-->
                         <div slot="header" class="clearfix" >
                             {{item.pname}}
-
+                        </div>
+                        <div  class="text item">
+                            项目id:{{item.pid}}
                         </div>
                         <div  class="text item">
                             需求人数:{{item.member}}
@@ -35,13 +33,12 @@
                         <div  class="text item">
                             已选人数:{{item.selected}}
                         </div>
-
                         <div >
                             <el-button type="primary" @click="showProjectDetail(item.pid)" >详情</el-button>
-                            <el-button type="success" @click="chooseVisible=true" v-if="item.status==4">选择学生</el-button>
-                            <el-button type="success" @click="seeVisible=true" v-if="item.status==4">查看学生</el-button>
+                            <el-button type="success" @click="showChooseStu(item)" v-if="item.status==4">选择学生</el-button>
+                            <el-button type="success" @click="showStu(item)" v-if="item.status==4">查看学生</el-button>
                             <el-button type="info" @click="" v-if="item.status==3">审核不通过</el-button>
-                            <el-button type="danger" @click="deleteProject(item.pid)" v-if="item.status==3">删除</el-button>
+                            <el-button type="danger" @click="deleteProject(item)" v-if="item.status==3">删除</el-button>
                             <el-button type="info" @click="" v-if="item.status==2" >审核中</el-button>
                             <el-button type="warning" @click="cancel(item.pid)" v-if="item.status==2" >撤回</el-button>
                             <el-button type="success" @click="publish(item.pid)" v-if="item.status==1">发布</el-button>
@@ -50,66 +47,76 @@
                     </el-card>
                 </el-col>
             </el-row>
+            <div class="pagination">
+                <el-pagination
+                        background
+                        layout="total,sizes, prev, pager, next,jumper"
+                        :current-page="ProjectReq.current"
+                        :page-sizes="[3,8, 10, 12, 14]"
+                        :page-size="ProjectReq.size"
+                        :total="page.total"
+                        @current-change="currentChange"
+                        @size-change="sizeChange"
+                ></el-pagination>
+            </div>
         </div>
-
-
-
 
 
         <!-- 选择学生弹出框 -->
         <el-dialog title="选择学生" :visible.sync="chooseVisible" width="90%">
-
             <el-row >
-                <h1 align="center">综合实践管理系统</h1>
+                <h1 align="center">{{choiceShow.projectTitle}} </h1>
             </el-row>
-
-
-            <div align="center" style="padding: 10px">
-                <el-input v-model="query.name" placeholder="学生名" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="el-icon-search" @click="">搜索</el-button>
+            <div align="center">
+                <el-radio-group v-model="choiceReq.type" style="padding: 10px" >
+                    <el-radio-button  label="">全选</el-radio-button>
+                    <el-radio-button  label="1">第一志愿</el-radio-button>
+                    <el-radio-button label="2">第二志愿</el-radio-button>
+                    <el-radio-button label="3">第三志愿</el-radio-button>
+                </el-radio-group>
+                <span>&emsp;&emsp;&emsp;&emsp;需求人数：{{choiceShow.member}}&emsp;&emsp;&emsp;已选人数：{{choiceShow.selected}} &emsp;&emsp;&emsp;可选人数：{{choiceShow.require}} </span>
             </div>
 
             <el-row>
-                <el-col :span="4.6" v-for="student in students" style="padding: 8px" >
-                    <el-card class="box-card" style="width: 290px;height: 380px">
+                <h2 align="center" v-if="choices.length == 0">暂无学生选择 </h2>
+                <el-col :span="4.6" v-for="choice in choices" style="padding: 8px" >
+                    <el-card class="box-card" style="width: 290px;height: 380px" >
 
                         <div  class="text item">
-                            姓名:{{student.name}}
+                            姓名:{{choice.member.name}}
                         </div>
                         <div  class="text item">
-                            联系地址:{{student.address}}
+                            联系地址:{{choice.member.address}}
                         </div>
                         <div  class="text item">
-                            联系电话:{{student.telephone}}
+                            联系电话:{{choice.member.phone}}
                         </div>
                         <div  class="text item">
-                            电子邮箱:{{student.email}}
+                            电子邮箱:{{choice.member.email}}
                         </div>
-                        <div  class="text item" v-if="student.source == 1">
+                        <div  class="text item" v-if="choice.type == 1">
                             来源:第一志愿
                         </div>
-                        <div  class="text item" v-else-if="student.source == 2">
-                            来源:第一志愿
+                        <div  class="text item" v-else-if="choice.type == 2">
+                            来源:第二志愿
                         </div>
-                        <div  class="text item" v-else-if="student.source == 3">
-                            来源:第一志愿
+                        <div  class="text item" v-else-if="choice.type == 3">
+                            来源:第三志愿
                         </div>
-                        <div  class="text item">
-                            自我简介:{{student.introduction}}
+                        <div  class="text item" style="height: 100px">
+                            自我简介:{{choice.choiceIntro}}
                         </div>
-                        <div  class="text item" align="center" style="align:center">
-                            <div  class="text item" style="position: absolute;bottom: 0;">
-                                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-                                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                        <div  class="text item" align="center">
+                            <div  class="text item" style="bottom: 0">
+<!--                            <div  class="text item" style="position: absolute;bottom: 0;">-->
+<!--                                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->
+<!--                                &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-->
                                 <el-row  class="el-dialog--center" >
-                                    <el-button type="primary" @click="chooseStudent(student.id)" v-if="student.choose==0">选择</el-button>
-                                    <el-button type="success" @click="" v-if="student.choose==1">已选择</el-button>
-                                    <el-button type="danger" @click="cancelStudent(student.id)"  v-if="student.choose==2">取消</el-button>
+                                    <el-button type="primary" @click="chooseStudent(choice.member)" v-if="choice.member.choose==0">选择</el-button>
+                                    <el-button type="danger" @click="cancelStudent(choice.member)"  v-if="choice.member.choose==1">取消</el-button>
                                 </el-row>
                             </div>
                         </div>
-
-
                     </el-card>
                 </el-col>
             </el-row>
@@ -117,16 +124,18 @@
             <div class="pagination">
                 <el-pagination
                         background
-                        layout="total, prev, pager, next"
-                        :current-page="query.pageIndex"
-                        :page-size="query.pageSize"
-                        :total="pageTotal"
-                        @current-change="handlePageChange"
+                        layout="total,sizes, prev, pager, next,jumper"
+                        :current-page="choiceReq.current"
+                        :page-sizes="[3,4, 5, 6, 7]"
+                        :page-size="choiceReq.size"
+                        :total="pageChoice.total"
+                        @current-change="currentChangeChoice"
+                        @size-change="sizeChangeChoice"
                 ></el-pagination>
             </div>
             <div align="center">
                 <el-row>
-                    <el-button type="primary" @click="showCheck">确认选择</el-button>
+                    <el-button type="primary" @click="chooseCheck">确认选择</el-button>
                     <el-button @click="idsReset">重置</el-button>
                 </el-row>
             </div>
@@ -142,22 +151,34 @@
                 <h1 align="center">综合实践管理系统</h1>
             </el-row>
             <el-row>
+                <h2 align="center" v-if="students.length <1">暂无学生入选 </h2>
                 <el-col :span="4.6" v-for="student in students" style="padding: 8px">
                     <el-card class="box-card" style="width: 290px;height: 400px">
                         <div slot="header" >
                             <span>{{student.name}}</span>
                         </div>
                         <div  class="text item">
-                            联系地址:{{student.address}}
+                            年级:{{student.grade}}
                         </div>
                         <div  class="text item">
-                            联系电话:{{student.telephone}}
+                            学院:{{student.college}}
                         </div>
                         <div  class="text item">
-                            电子邮箱:{{student.email}}
+                            专业:{{student.major}}
                         </div>
                         <div  class="text item">
-                            自我简介:{{student.introduction}}
+                            班级:{{student.classes}}
+                        </div>
+
+                        <div  class="text item">
+                            联系地址:{{student.address}}<span v-if="student.address == null"> 未填写</span>
+
+                        </div>
+                        <div  class="text item">
+                            联系电话:{{student.telephone}}<span v-if="student.telephone == null"> 未填写</span>
+                        </div>
+                        <div  class="text item">
+                            电子邮箱:{{student.email}}<span v-if="student.email == null"> 未填写</span>
                         </div>
 
 
@@ -238,22 +259,29 @@
                 <el-form-item label="要求简要" :label-width="formLabelWidth">
                     <quill-editor ref="myTextEditor" v-model="project.content" :options="editorOption"></quill-editor>
                 </el-form-item>
-                <el-form-item label="详细报告" :label-width="formLabelWidth">
-                    <el-upload
-                            class="upload-demo"
-                            drag
-                            action="https://jsonplaceholder.typicode.com/posts/"
-                            :file-list="fileList">
-                        <i class="el-icon-upload"></i>
-                        <div class="el-upload__text" >将文件拖到此处，或<em>点击上传</em></div>
-                        <div class="el-upload__tip" slot="tip">只能上传pdf,zip,doc或docx文件，且不超过500kb</div>
-                    </el-upload>
+                <el-form-item label="详细文档" :label-width="formLabelWidth">
+                    <input type="file" ref="myfile">
+                    <el-button  @click="uploadData" id="btn" type="success" size="mini" icon="el-icon-upload2" style="visibility:visible">导入数据</el-button>
+<!--                    <el-upload-->
+<!--                            style="display: inline"-->
+<!--                            class="upload-demo"-->
+<!--                            :on-success="onSuccess"-->
+<!--                            :on-error="onError"-->
+<!--                            :before-upload="beforeUpload"-->
+<!--                            drag-->
+<!--                            action="https://localhost:8088/file"-->
+<!--                            :limit="1"-->
+<!--                            :file-list="fileList">-->
+<!--                        <i class="el-icon-upload"></i>-->
+<!--                        <div class="el-upload__text" >将文件拖到此处，或<em>点击上传</em></div>-->
+<!--                        <div class="el-upload__tip" slot="tip">只能上传pdf,zip,doc或docx文件，且不超过500kb</div>-->
+<!--                    </el-upload>-->
                 </el-form-item>
 
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="createProject">保存</el-button>
-                <el-button type="success" @click="dialogFormVisible = false">保存并提交</el-button>
+                <el-button type="success" @click="createAndPublishProject">保存并提交</el-button>
                 <el-button type="danger" @click="reset">重置</el-button>
             </div>
         </el-dialog>
@@ -265,24 +293,18 @@
 
         <!--确认学生-->
         <el-dialog title="确认学生" :visible.sync="checkVisible" width="30%">
-
                 <div style="width: 400px">
                     <div class="user-info-list" style="padding: 10px">
                         当前选择的学生：&emsp;
                     </div>
-                    <div class="user-info-list" style="padding: 10px">
-                        <span v-for="student in students">
+                    <div class="user-info-list" v-for="name in names " style="padding: 10px">
                             <div>
-                             <span v-for="id in ids " v-if="id == student.id">{{student.name}}</span>
+                             <span  >{{name}}</span>
                             </div>
-                        </span>
                     </div>
-
-
                 </div>
-
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="">提交</el-button>
+                <el-button type="primary" @click="submitChoices">提交</el-button>
                 <el-button @click="checkVisible = false">取消</el-button>
             </span>
         </el-dialog>
@@ -302,17 +324,62 @@
         },
         data() {
             return {
+                deleteProjectReq:{
+                  pId:"",
+                },
+                students:[],
+                showStuReq:{
+                    pId:'',
+                },
+                choiceDemo:{
+                    cid:'',
+                    pid:'',
+                    mid:'',
+                    type:'',
+                },
+                list:[],
+                //查看志愿请求参数
+                choiceReq:{
+                    pId:'',
+                    type:'',
+                    current: 1,
+                    size:5,
+                },
+                //查看志愿分页参数
+                pageChoice:{
+                    pages:1,
+                    total:1,
+                },
+                //查看志愿项目名称
+                choiceShow:{
+                    projectTitle: '综合实践管理系统',
+                    member: 0,
+                    selected: 0 ,
+                    require: 0,
+                },
+
+
+                //查看项目分页参数
+                page:{
+                    pages:1,
+                    total:1,
+                },
+                //查看项目参数
                 ProjectReq:{
                     pId:'',
                     status:'',
                     teacherId:'',
                     rejectContent:'',
                     pName:'',
+                    size: 10,
+                    current: 1,
                     },
-                fileList: [{name: 'food.doc', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}],
+                fileList: [],
+                //富文本编辑器提示内容
                 editorOption: {
                     placeholder: '请输入通知内容'
                 },
+                //新建项目参数
                 projectDemo:{
                     pid:'',
                     teacherId:'',
@@ -328,6 +395,7 @@
                     second:'',
                     third:'',
                 },
+                //项目参数
                 project:{
                     pid:'',
                     teacherId:'',
@@ -336,13 +404,17 @@
                     content:'',
                     member:'',
                     file:'',
-                    status:'',
+                    status:'1',
                     isFull:'',
                     selected:'',
                     first:'',
                     second:'',
                     third:'',
                 },
+                //项目参数
+                projects:[
+
+                ],
                 requires:[{
                     value: '1',
                     label: '1'
@@ -367,73 +439,38 @@
                     label: '7'
                 },
                 ],
-                ids:[
+                names:[
 
                 ],
                 seeVisible: false,
                 checkVisible: false,
                 chooseVisible:false,
-                students:[{
-                        id:2,
-                        name: '张三',
-                        introduction: '我爱学习，天天学习，学习使我快乐',
-                        address:'d8-666',
-                        telephone:'222111222',
-                        email:'111222333',
-                        source:'1',
-                        choose:'0',
-                    },
-                    {
-                        id:3,
-                        name: '张四',
-                        introduction: '我爱学习，天天学习，学习使我快乐',
-                        address:'d8-666',
-                        telephone:'222111222',
-                        email:'111222333',
-                        source:'2',
-                        choose:'1',
-                    },
-                    {
-                        id:4,
-                        name: '张五',
-                        introduction: '我爱学习，天天学习，学习使我快乐',
-                        address:'d8-666',
-                        telephone:'222111222',
-                        email:'111222333',
-                        source:'3',
-                        choose:'0',
-                    },
-                    {
-                        id:5,
-                        name: '张六',
-                        introduction: '我爱学习，天天学习，学习使我快乐',
-                        address:'d8-666',
-                        telephone:'222111222',
-                        email:'111222333',
-                        source:'2',
-                        choose:'0',
-                    },{
-                    id:6,
-                        name: '张七',
-                        introduction: '我爱学习，天天学习，学习使我快乐',
-                        address:'d8-666',
-                        telephone:'222111222',
-                        email:'111222333',
-                        source:'1',
-                        choose:'0',
-                    },
-
-
+                //查看志愿参数
+                choices:[{
+                    cId:'',
+                    pId:'',
+                    mId:'',
+                    type:'',
+                    choiceIntro:'',
+                    member:[{
+                        mid:'',
+                        name:'',
+                        userName:'',
+                        grade:'',
+                        college:'',
+                        major:'',
+                        classes:'',
+                        address:'',
+                        phone:'',
+                        email:'',
+                    }]
+                }
                 ],
                 detailVisible: false,
 
                 formLabelWidth:'100px',
-                choosen:{
-                    first: '207',
-                    second: '208',
-                    third: '209',
-                },
-                    projects :[{
+
+                projects :[{
                         pid:'123',
                         teacherId:'123',
                         pname:'123',
@@ -449,12 +486,6 @@
                         third:'123',
                     }
                 ],
-                query: {
-                    address: '',
-                    name: '',
-                    pageIndex: 1,
-                    pageSize: 10
-                },
                 tableData: [],
                 multipleSelection: [],
                 delList: [],
@@ -471,28 +502,161 @@
         components: {
             quillEditor
         },
-
-        methods: {
-            deleteProject(item){
-                this.$deleteRequest("/project/"+item.pid).then(res=>{
-
-                    if(res.body.resultCode=='0000'){
-                        this.$message.success("删除成功");
-                        Object.keys(this.projects).forEach(key => {
-                            if(this.projects[key].pid === item.pid){
-                                this.projects.splice(this.projects.indexOf(item),1);
-                            }
-                        });
-
-                    }else{
-                        this.$message.error("删除失败");
-                    }
-                }).catch(
-                    reason => {
-                        this.$message.error(reason);
-                    }
-                )
+        watch: {
+            'choiceReq.type': { // 监视pagination属性的变化
+                // deep: true, // deep为true，会监视pagination的属性及属性中的对象属性变化
+                handler() {
+                    this.initPageChoice();
+                    // 变化后的回调函数，这里我们再次调用getDataFromServer即可
+                    this.getChoiceData();
+                }
             },
+
+        },
+        methods: {
+            uploadData(){
+                let myFile = this.$refs.myfile;
+                let files = myFile.files;
+                let file = files[0];
+                let formData = new FormData();
+                formData.append("file", file);
+                this.$upload("/file",formData).then(resp=>{
+                    if (resp) {
+                        console.log(resp);
+                    }
+                })
+            },
+            onSuccess(response, file, fileList) {
+                this.$message.success("上传成功")
+            },
+            onError(err, file, fileList) {
+                this.$message.error("上传失败")
+            },
+            beforeUpload(file) {
+                this.$message.warning("上传中")
+            },
+            //查看已选学生信息
+            showStu(project){
+                this.showStuReq.pId = project.pid;
+                this.$fetch("/project/students",this.showStuReq).then(res=>{
+                    this.students = res;
+                    this.seeVisible=true
+                })
+
+            },
+            //老师提交所选学生
+            submitChoices(){
+                this.$post("/project/submitChoice",this.list).then(res=>{
+                    if(res ==1) {
+                        this.choiceShow.selected += this.list.length;
+                        this.choiceShow.require -= this.list.length;
+                        this.checkVisible = false;
+                        this.$message.success("选择成功");
+                        this.initPageChoice();
+                        this.getChoiceData();
+                        this.loadData();
+                    }else{
+                        this.$message.error("选择失败");
+                    }
+                })
+            },
+            //确认是否选择
+            chooseCheck(){
+
+                this.list = [];
+                this.names = [];
+                this.choices.forEach(choice => {
+                    if (choice.member.choose == 1) {
+                        // this.choiceDemo.cid = choice.cid;
+                        // this.choiceDemo.mid = choice.mid;
+                        // this.choiceDemo.pid = choice.pid;
+                        // this.choiceDemo.type = choice.type;
+                        // this.list.add(this.choiceDemo);
+                        // this.names.add(choice.member.name);
+                        this.list.push(choice);
+                        this.names.push(choice.member.name);
+                    }
+
+                })
+                if(this.list.length >this.choiceShow.require){
+                    this.$message.error("选择人数不能大于可选需求人数")
+                }else {
+                    this.checkVisible = true;
+                }
+            },
+            //页面改变事件
+            currentChangeChoice(val){
+                this.choiceReq.current = val;
+                this.getChoiceData();
+            },
+            //页面大小改变事件
+            sizeChangeChoice(val){
+                this.choiceReq.size = val;
+                this.getChoiceData();
+            },
+            //初始化分页条件
+            initPageChoice(){
+                this.choiceReq.current=1;
+                this.pageChoice.pages=1;
+                this.pageChoice.total=0;
+            },
+            //打开选择学生模态框
+            showChooseStu(project){
+                this.choiceReq.type = '';
+                this.choiceShow.projectTitle = project.pname;
+                this.choiceShow.member = project.member;
+                this.choiceShow.selected = project.selected;
+                this.choiceShow.require = project.member- project.selected;
+                this.choiceReq.pId = project.pid;
+                this.initPageChoice
+                this.$fetch("/project/stuChoice",this.choiceReq).then(res=>{
+                    this.choices = res.records;
+                    this.pageChoice.pages = res.pages;
+                    this.pageChoice.total = res.total;
+                    this.choiceReq.size = res.size;
+                })
+                this.chooseVisible=true
+            },
+            //获取志愿信息
+            getChoiceData(){
+                this.$fetch("/project/stuChoice",this.choiceReq).then(res=>{
+                    this.choices = res.records;
+                    this.pageChoice.pages = res.pages;
+                    this.pageChoice.total = res.total;
+                    this.choiceReq.size = res.size;
+                })
+            },
+            //删除项目信息
+            deleteProject(item){
+                this.$confirm('确定要删除项目吗？', '提示', {
+                    type: 'warning'
+                }).then(() => {
+
+                    this.$deleteRequest("/project/"+item.pid).then(res=>{
+                        if(res.resultCode=='0000'){
+                            this.$message.success("删除成功");
+                            Object.keys(this.projects).forEach(key => {
+                                if(this.projects[key].pid === item.pid){
+                                    this.projects.splice(this.projects.indexOf(item),1);
+                                }
+                            });
+
+                        }else{
+                            this.$message.error("删除失败");
+                        }
+                    }).catch(
+                        reason => {
+                            this.$message.error(reason);
+                        }
+                    )
+                }).catch(() => {
+                });
+
+
+
+
+            },
+            //发布项目
             publish(pid){
                 this.$put("/project/"+pid).then(res=>{
                     if(res.body.resultCode=='0000'){
@@ -512,6 +676,7 @@
                     }
                 )
             },
+            //撤回项目审核
             cancel(pid){
                 this.$put("/project/cancel/"+pid).then(res=>{
                     if(res.body.resultCode=='0000'){
@@ -531,11 +696,30 @@
                     }
                 )
             },
+            //页面改变事件
+            currentChange(val){
+                this.ProjectReq.current = val;
+                this.loadData();
+            },
+            //页面大小改变事件
+            sizeChange(val){
+                this.ProjectReq.size = val;
+                this.loadData();
+            },
+            //初始化分页条件
+            initPage(){
+                this.ProjectReq.current=1;
+                this.page.pages=1;
+                this.page.total=0;
+            },
             //加载项目数据
             loadData(){
                 this.ProjectReq.teacherId = this.$cookies.get("mid");
                 this.$fetch("/project",this.ProjectReq).then(res=>{
-                    this.projects = res;
+                    this.projects = res.records;
+                    this.page.total = res.total;
+                    this.page.pages = res.pages;
+                    this.ProjectReq.size = res.size;
                 })
             },
             //查看项目详情
@@ -561,6 +745,7 @@
             //创建项目
             createProject(){
                 this.project.teacherId = this.$cookies.get("mid");
+                this.project.file = this.fileList.pop().url;
                 this.$post("/project",this.project).then(res =>{
                     if(res.resultCode === "0000") {
                         this.reset();
@@ -572,85 +757,25 @@
                     }
                 });
             },
-            chooseStudent(id){
-                for (let i=0; i<this.students.length;i++) {
-                    let student = this.students[i];
-                    if(student.id==id){
-                        student.choose =2;
-                        this.ids.push(id);
-                    }
-                }
+            //创建项目
+            createAndPublishProject(){
+                this.project.status = 2
+                this.createProject
             },
-            cancelStudent(id){
-                for (let i=0; i<this.students.length;i++) {
-                    let student = this.students[i];
-                    if(student.id==id){
-                        student.choose =0;
-                        for(let j=0;j<this.ids.length;j++){
-                            let idd = this.ids[j]
-                            if(idd == id){
-                                this.ids.splice(j,1);
-                            }
+            //选中学生
+            chooseStudent(member){
+                member.choose = 1;
+            },
+            //取消选中学生
+            cancelStudent(member){
+                member.choose = 0;
+            },
 
-                        }
-                    }
-                }
-            },
-            showCheck(){
-                this.checkVisible= true;
 
-            },
             showDetail(id){
 
             },
-            // 触发搜索按钮
-            handleSearch() {
-                this.$set(this.query, 'pageIndex', 1);
-                this.getData();
-            },
-            // 删除操作
-            handleDelete(index, row) {
-                // 二次确认删除
-                this.$confirm('确定要删除吗？', '提示', {
-                    type: 'warning'
-                })
-                    .then(() => {
-                        this.$message.success('删除成功');
-                        this.tableData.splice(index, 1);
-                    })
-                    .catch(() => {});
-            },
-            // 多选操作
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-            delAllSelection() {
-                const length = this.multipleSelection.length;
-                let str = '';
-                this.delList = this.delList.concat(this.multipleSelection);
-                for (let i = 0; i < length; i++) {
-                    str += this.multipleSelection[i].name + ' ';
-                }
-                this.$message.error(`删除了${str}`);
-                this.multipleSelection = [];
-            },
-            // 编辑操作
-            handleEdit(index, row) {
-                this.idx = index;
-                this.form = row;
-                this.editVisible = true;
-            },
-            // 保存编辑
-            saveEdit() {
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-                this.$set(this.tableData, this.idx, this.form);
-            },
-            // 分页导航
-            handlePageChange(val) {
-                this.$set(this.query, 'pageIndex', val);
-                this.getData();
-            },
+
             idsReset(){
               this.ids=[];
             },

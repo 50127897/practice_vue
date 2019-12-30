@@ -189,7 +189,7 @@
                     teacherid:'',
                     rejectContent:'',
                     pName:'',
-                    size: 3,
+                    size: 12,
                     current: 1,
                 },
                 ProjectRequest:{
@@ -270,24 +270,29 @@
 
         },
         methods: {
+            //查找项目 模糊查询
             searchProject(){
                 this.initPage();
                 // 变化后的回调函数，这里我们再次调用getDataFromServer即可
                 this.getData();
             },
+            //初始化分页条件
             initPage(){
-                this.ProjectReq.current='';
-                this.page.pages='';
-                this.page.total='';
+                this.ProjectReq.current=1;
+                this.page.pages=1;
+                this.page.total=0;
             },
+            //页面改变事件
             currentChange(val){
                 this.ProjectReq.current = val;
                 this.getData();
             },
+            //页面大小改变事件
             sizeChange(val){
                 this.ProjectReq.size = val;
                 this.getData();
             },
+            //审核通过
             passProject(item){
                 this.ProjectRequest.pid = item.pid;
                 this.ProjectRequest.status = 4;
@@ -300,6 +305,7 @@
                     });
                 })
             },
+            //弹窗驳回窗口
             showReject(item){
                 Object.keys(this.projects).forEach(key => {
                     if(this.projects[key].pid === item.pid){
@@ -308,6 +314,7 @@
                 });
                 this.rejectVisible=true
             },
+            //驳回项目
             rejectProject(pid){
                 this.ProjectRequest.pid = pid;
                 this.ProjectRequest.status = 3 ;
@@ -321,6 +328,7 @@
                     this.rejectVisible = false;
                 })
             },
+            //查看项目详情
             showDetail(id){
                 Object.keys(this.projects).forEach(key => {
                     if(this.projects[key].pid === id){
@@ -329,6 +337,7 @@
                 });
                 this.detailVisible=true
             },
+            //获取数据
             getData(){
                 this.$fetch("/project",this.ProjectReq).then(res=>{
                     this.projects = res.records;

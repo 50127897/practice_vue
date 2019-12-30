@@ -137,3 +137,30 @@ export function deleteRequest(url,data = {}){
             })
     })
 }
+
+
+
+/**
+ * 封装post请求
+ * @param url
+ * @param data
+ * @returns {Pro
+mise}
+ */
+
+export function upload(url,data = {}){
+    return new Promise((resolve,reject) => {
+        axios({
+            method: 'post',
+            url: url,
+            data: data,
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(response => {
+            resolve(response.data);
+        },err => {
+            reject(err)
+        })
+    })
+}
