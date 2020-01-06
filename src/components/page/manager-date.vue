@@ -7,24 +7,27 @@
         </div>
         <div class="container" style="width: 100%;padding: 40px" >
 
-
             <el-row style="padding: 10px;" >
                 <td width="250px" align="center">
                     老师发布项目时间
                 </td>
                 <td >
                     <el-date-picker
-                            v-model="day1"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
+
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            v-model="dateReq.publishStart"
+                            type="date"
+                            placeholder="开始日期">
+                    </el-date-picker>
+                    --
+                    <el-date-picker
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            @change="publishChange"
+                            v-model="dateReq.publishEnd"
+                            type="date"
+                            placeholder="结束日期">
+                    </el-date-picker>
                 </td>
-                <td><el-button type="primary">更改</el-button></td>
             </el-row>
 
 
@@ -34,77 +37,47 @@
                 </td>
                 <td >
                     <el-date-picker
-                            v-model="day2"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            readonly
+                            v-model="dateReq.stuFirstChoiceStart"
+                            type="date"
+                            placeholder="开始日期">
+                    </el-date-picker>
+                    --
+                    <el-date-picker
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            @change="stuFirstChoiceChange"
+                            v-model="dateReq.stuFirstChoiceEnd"
+                            type="date"
+                            placeholder="结束日期">
+                    </el-date-picker>
                 </td>
-                <td><el-button type="primary">更改</el-button></td>
             </el-row>
 
             <el-row style="padding: 10px;" >
                 <td width="250px" align="center">
-                    老师第一志愿选择时间
+                    老师第一次选择时间
                 </td>
                 <td >
                     <el-date-picker
-                            v-model="day3"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
-                </td>
-                <td><el-button type="primary">更改</el-button></td>
-            </el-row>
-
-
-            <el-row style="padding: 10px;" >
-                <td width="250px" align="center">
-                    老师第二志愿选择时间
-                </td>
-                <td >
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            readonly
+                            v-model="dateReq.teacherFirstChoiceStart"
+                            type="date"
+                            placeholder="开始日期">
+                    </el-date-picker>
+                    --
                     <el-date-picker
-                            v-model="day4"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            @change="teacherFirstChoiceChange"
+                            v-model="dateReq.teacherFirstChoiceEnd"
+                            type="date"
+                            placeholder="结束日期">
+                    </el-date-picker>
                 </td>
-                <td><el-button type="primary">更改</el-button></td>
             </el-row>
 
 
-            <el-row style="padding: 10px;" >
-                <td width="250px" align="center">
-                    老师第三志愿选择时间
-                </td>
-                <td >
-                    <el-date-picker
-                            v-model="day5"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
-                </td>
-                <td><el-button type="primary">更改</el-button></td>
-            </el-row>
 
 
             <el-row style="padding: 10px;" >
@@ -113,78 +86,48 @@
                 </td>
                 <td >
                     <el-date-picker
-                            v-model="day6"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
+                            readonly
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            v-model="dateReq.stuSecondChoiceStart"
+                            type="date"
+                            placeholder="开始日期">
+                    </el-date-picker>
+                    --
+                    <el-date-picker
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            @change="stuSecondChoiceChange"
+                            v-model="dateReq.stuSecondChoiceEnd"
+                            type="date"
+                            placeholder="结束日期">
+                    </el-date-picker>
                 </td>
-                <td><el-button type="primary">更改</el-button></td>
             </el-row>
 
 
             <el-row style="padding: 10px;" >
                 <td width="250px" align="center">
-                    老师第二次第一志愿选择时间
+                    老师第二次选择时间
                 </td>
                 <td >
                     <el-date-picker
-                            v-model="day7"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
-                </td>
-                <td><el-button type="primary">更改</el-button></td>
-            </el-row>
-
-
-            <el-row style="padding: 10px;" >
-                <td width="250px" align="center">
-                    老师第二次第二志愿选择时间
-                </td>
-                <td >
+                            readonly
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            v-model="dateReq.teacherSecondChoiceStart"
+                            type="date"
+                            placeholder="开始日期">
+                    </el-date-picker>
+                    --
                     <el-date-picker
-                            v-model="day8"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            @change="teacherSecondChoiceChange"
+                            v-model="dateReq.teacherSecondChoiceEnd"
+                            type="date"
+                            placeholder="结束日期">
+                    </el-date-picker>
                 </td>
-                <td><el-button type="primary">更改</el-button></td>
             </el-row>
 
 
-            <el-row style="padding: 10px;" >
-                <td width="250px" align="center">
-                    老师第二次第三志愿选择时间
-                </td>
-                <td >
-                    <el-date-picker
-                            v-model="day9"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
-                </td>
-                <td><el-button type="primary">更改</el-button></td>
-            </el-row>
 
 
             <el-row style="padding: 10px;" >
@@ -193,17 +136,21 @@
                 </td>
                 <td >
                     <el-date-picker
-                            v-model="day10"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
+                            readonly
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            v-model="dateReq.teacherThirdChoiceStart"
+                            type="date"
+                            placeholder="开始日期">
+                    </el-date-picker>
+                    --
+                    <el-date-picker
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            @change="teacherThirdChoiceChange"
+                            v-model="dateReq.teacherThirdChoiceEnd"
+                            type="date"
+                            placeholder="结束日期">
+                    </el-date-picker>
                 </td>
-                <td><el-button type="primary">更改</el-button></td>
             </el-row>
 
 
@@ -213,19 +160,28 @@
                 </td>
                 <td >
                     <el-date-picker
-                            v-model="day11"
-                            type="daterange"
-                            align="right"
-                            unlink-panels
-                            range-separator="至"
-                            start-placeholder="开始日期"
-                            end-placeholder="结束日期"
-                            :picker-options="pickerOptions">
-                    </el-date-picker>&emsp;
+                            readonly
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            v-model="dateReq.projectFinalStart"
+                            type="date"
+                            placeholder="开始日期">
+                    </el-date-picker>
+                    --
+                    <el-date-picker
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            v-model="dateReq.projectFinalEnd"
+                            type="date"
+                            placeholder="结束日期">
+                    </el-date-picker>
                 </td>
-                <td><el-button type="primary">更改</el-button></td>
             </el-row>
 
+            <el-row style="padding: 10px;" >
+                <td width="440px" align="center">
+
+                </td>
+                <td><el-button type="primary" @click="onSubmit">提交更改</el-button></td>
+            </el-row>
 
 
 
@@ -239,87 +195,67 @@ export default {
     name: 'baseform',
     data() {
         return {
-            day1:'',
-            day2:'',
-            day3:'',
-            day4:'',
-            day5:'',
-            day6:'',
-            day7:'',
-            day8:'',
-            day9:'',
-            day10:'',
-            day11:'',
+            dateReq: {
+                publishStart: '',
+                stuFirstChoiceStart: '',
+                teacherFirstChoiceStart: '',
+                stuSecondChoiceStart: '',
+                teacherSecondChoiceStart: '',
+                teacherThirdChoiceStart: '',
+                projectFinalStart: '',
 
-            options: [
-                {
-                    value: 'guangdong',
-                    label: '广东省',
-                    children: [
-                        {
-                            value: 'guangzhou',
-                            label: '广州市',
-                            children: [
-                                {
-                                    value: 'tianhe',
-                                    label: '天河区'
-                                },
-                                {
-                                    value: 'haizhu',
-                                    label: '海珠区'
-                                }
-                            ]
-                        },
-                        {
-                            value: 'dongguan',
-                            label: '东莞市',
-                            children: [
-                                {
-                                    value: 'changan',
-                                    label: '长安镇'
-                                },
-                                {
-                                    value: 'humen',
-                                    label: '虎门镇'
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    value: 'hunan',
-                    label: '湖南省',
-                    children: [
-                        {
-                            value: 'changsha',
-                            label: '长沙市',
-                            children: [
-                                {
-                                    value: 'yuelu',
-                                    label: '岳麓区'
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
-            form: {
-                name: '',
-                region: '',
-                date1: '',
-                date2: '',
-                delivery: true,
-                type: ['步步高'],
-                resource: '小天才',
-                desc: '',
-                options: []
-            }
-        };
+                publishEnd: '',
+                stuFirstChoiceEnd: '',
+                teacherFirstChoiceEnd: '',
+                stuSecondChoiceEnd: '',
+                teacherSecondChoiceEnd: '',
+                teacherThirdChoiceEnd: '',
+                projectFinalEnd: '',
+            },
+
+
+        }
+    },
+    created() {
+        this.loadData();
     },
     methods: {
+        loadData(){
+            this.$fetch("/time").then(
+                res=>{
+                    this.dateReq = res;
+                }
+            )
+        },
+        teacherThirdChoiceChange(){
+            this.dateReq.projectFinalStart = this.dateReq.teacherThirdChoiceEnd
+        },
+        teacherSecondChoiceChange(){
+            this.dateReq.teacherThirdChoiceStart = this.dateReq.teacherSecondChoiceEnd
+        },
+        stuSecondChoiceChange(){
+            this.dateReq.teacherSecondChoiceStart = this.dateReq.stuSecondChoiceEnd
+        },
+
+        teacherFirstChoiceChange(){
+            this.dateReq.stuSecondChoiceStart = this.dateReq.teacherFirstChoiceEnd
+        },
+        stuFirstChoiceChange(){
+            this.dateReq.teacherFirstChoiceStart = this.dateReq.stuFirstChoiceEnd
+        },
+
+        publishChange(){
+            this.dateReq.stuFirstChoiceStart = this.dateReq.publishEnd
+        },
         onSubmit() {
-            this.$message.success('提交成功！');
+            this.$post("/time",this.dateReq).then(
+                res=>{
+                    this.$message.success('更新时间成功！');
+                }
+            )
+
         }
+
     }
 };
 </script>

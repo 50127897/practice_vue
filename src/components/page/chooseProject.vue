@@ -300,25 +300,27 @@
             submitChoice(){
                 if(this.List[0].pid == ''||this.List[1].pid == ''||this.List[2].pid == ''){
                     this.$message.error("请选中三个志愿后再提交")
+
+                }else {
+                    this.List[0].mid = this.$cookies.get("mid")
+                    this.List[1].mid = this.$cookies.get("mid")
+                    this.List[2].mid = this.$cookies.get("mid")
+                    // 二次确认提交志愿
+                    this.$confirm('确定要提交志愿吗？', '提示', {
+                        type: 'success'
+                    }).then(() => {
+                        this.$post("/project/choice", this.List).then(
+                            res => {
+                                this.$message.success(res.message);
+                                this.getChoice();
+                            }
+                        )
+
+
+                    })
+                        .catch(() => {
+                        });
                 }
-                this.List[0].mid = this.$cookies.get("mid")
-                this.List[1].mid = this.$cookies.get("mid")
-                this.List[2].mid = this.$cookies.get("mid")
-                // 二次确认提交志愿
-                this.$confirm('确定要提交志愿吗？', '提示', {
-                    type: 'success'
-                }).then(() => {
-                    this.$post("/project/choice",this.List).then(
-                        res=>{
-                            this.$message.success(res.message);
-                            this.getChoice();
-                        }
-                    )
-
-
-                })
-                    .catch(() => {
-                    });
 
             },
             //初始化分页条件

@@ -9,7 +9,7 @@
         </div>
         <div class="container">
             <el-row >
-                <h1 align="center">综合实践管理系统</h1>
+                <h1 align="center">{{ResultResp.pname}}</h1>
             </el-row>
             <el-row>
                 <el-col :span="0.1" style="padding: 8px">
@@ -39,7 +39,11 @@
                         </el-row>
                         <div v-html="ResultResp.content" style="padding: 20px"></div>
 
-                        <span><el-link @click="go(ResultResp.file)" target="_blank" style="font-size: large" type="primary">点击下载任务书</el-link></span>
+                        <el-button
+                                @click="getFile(ResultResp.teacherId)"
+                                type="text"
+                                icon="el-icon-document"
+                        >点击下载任务书</el-button>
                     </el-card>
 <!--                    <el-col :span="6" v-for="student in students" style="padding: 8px">-->
 <!--                        <el-card class="box-card" >-->
@@ -134,11 +138,15 @@
     export default {
         data() {
             return {
+                getFileReq:{
+                    studentId:'',
+                    type:'15',
+                },
                 resultReq:{
                     mid:'',
                 },
                 ResultResp:{
-                    pName:'',
+                    pname:'',
                     content:'',
                     file:'',
                     email:'',
@@ -152,8 +160,19 @@
             this.getData();
         },
         methods: {
-            go(file){
-                window.location.href = file
+            getFile(mid){
+                this.getFileReq.studentId = mid;
+                this.$getFile("/file",this.getFileReq).then(res=>{
+                    let url = window.URL.createObjectURL(res.data); //表示一个指定的file对象或Blob对象
+                    let a = document.createElement("a");
+                    document.body.appendChild(a);
+                    let filename= res.headers["content-disposition"].split(";")[1].split("filename=")[1];  //filename名称截取
+                    a.href = url;
+                    var strings = filename.split(".");
+                    a.download = "项目任务书."+strings[1]; //命名下载名称
+                    a.click(); //点击触发下载
+                    window.URL.revokeObjectURL(url);  //下载完成进行释放
+                })
             },
             // 获取 easy-mock 的模拟数据
             getData() {

@@ -164,3 +164,25 @@ export function upload(url,data = {}){
         })
     })
 }
+
+/**
+ * 封装post请求
+ * @param url
+ * @param data
+ * @returns {Pro
+mise}
+ */
+export function getFile(url,params={}){
+    return new Promise((resolve,reject) => {
+        axios.get(url,{
+            params:params,
+            responseType: 'blob'
+        })
+            .then(response => {
+                resolve(response);
+            })
+            .catch(err => {
+                reject(err)
+            })
+    })
+}
