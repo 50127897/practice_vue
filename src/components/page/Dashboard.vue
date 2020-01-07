@@ -60,7 +60,7 @@
                         <el-table :data="announceChild"  :show-header="false" style="width: 100%" >
                             <el-table-column>
                                 <template slot-scope="scope" >
-                                    <span class="message-title"  @click="showAnnounceDetail(scope.row.aid)">{{scope.row.title}}</span>
+                                    <span class="message-title"  @click="showAnnounceDetail(scope.row)">{{scope.row.title}}</span>
                                 </template>
                             </el-table-column>
                             <el-table-column width="180">
@@ -185,6 +185,7 @@
                 AnnounceParams: {
                     type: 2,
                     title: '',
+                    mid:'',
                 },
                 detailChild: this.detail,
                 announceChild:this.announce,
@@ -330,13 +331,9 @@
                 this.dialogFormVisible = true;
             },
             //通知详情，弹出通知模态框
-            showAnnounceDetail(aid){
-                this.announceChild.forEach(announce=>{
-                    if (announce.aid === aid) {
-                        this.detailChild = announce.content;
-                        this.detailVisible = true;
-                    }
-                })
+            showAnnounceDetail(announce){
+                this.detailChild = announce.content;
+                this.detailVisible = true;
             },
             //加载用户信息
             loadMemberInfo(){
@@ -349,6 +346,7 @@
             },
         },
         created() {
+            this.AnnounceParams.mid = this.$cookies.get("mid")
             //加载通知信息
             this.$fetch('/announce/',this.AnnounceParams).then(res => {
                 this.announceChild = res.data;

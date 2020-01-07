@@ -111,6 +111,8 @@ export default {
                             sessionStorage.setItem("token",res.data.token);
                             this.$cookies.set('mid', res.data.mid); //登录成功后将mid存储在cookie之中
                             this.$cookies.set('type', res.data.type); //登录成功后将type存储在cookie之中
+                            this.$cookies.set('pid', res.data.pid); //登录成功后将type存储在cookie之中
+                            this.$cookies.set('username', res.data.name); //登录成功后将type存储在cookie之中
                             this.$message.success(res.message);
                             this.$axios.defaults.headers.common['x-auth-token'] = res.data.token;
                             if (res.data.type == 3) {

@@ -83,6 +83,7 @@ export default {
             getFileReq:{
                 type:'',
                 studentId:'',
+                pid:'',
             },
             fileListReq:{
                 studentId:'',
@@ -182,6 +183,7 @@ export default {
         },
         // 获取 easy-mock 的模拟数据
         getData() {
+            this.fileListReq.pid = this.$cookies.get("pid")
             this.fileListReq.studentId = this.$cookies.get("mid")
             this.$fetch("/file/lists",this.fileListReq).then(res=>{
                 this.fileList = res;

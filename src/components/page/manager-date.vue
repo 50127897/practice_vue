@@ -38,7 +38,6 @@
                 <td >
                     <el-date-picker
                             value-format="yyyy-MM-dd HH:mm:ss"
-                            readonly
                             v-model="dateReq.stuFirstChoiceStart"
                             type="date"
                             placeholder="开始日期">
@@ -61,7 +60,6 @@
                 <td >
                     <el-date-picker
                             value-format="yyyy-MM-dd HH:mm:ss"
-                            readonly
                             v-model="dateReq.teacherFirstChoiceStart"
                             type="date"
                             placeholder="开始日期">
@@ -86,7 +84,6 @@
                 </td>
                 <td >
                     <el-date-picker
-                            readonly
                             value-format="yyyy-MM-dd HH:mm:ss"
                             v-model="dateReq.stuSecondChoiceStart"
                             type="date"
@@ -110,7 +107,6 @@
                 </td>
                 <td >
                     <el-date-picker
-                            readonly
                             value-format="yyyy-MM-dd HH:mm:ss"
                             v-model="dateReq.teacherSecondChoiceStart"
                             type="date"
@@ -136,7 +132,6 @@
                 </td>
                 <td >
                     <el-date-picker
-                            readonly
                             value-format="yyyy-MM-dd HH:mm:ss"
                             v-model="dateReq.teacherThirdChoiceStart"
                             type="date"
@@ -160,7 +155,6 @@
                 </td>
                 <td >
                     <el-date-picker
-                            readonly
                             value-format="yyyy-MM-dd HH:mm:ss"
                             v-model="dateReq.projectFinalStart"
                             type="date"

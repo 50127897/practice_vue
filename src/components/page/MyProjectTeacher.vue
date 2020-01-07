@@ -38,7 +38,7 @@
                             <el-button type="primary" v-if="item.status==4" @click="showProjectDoc(item.pid)" >文档</el-button>
                             <el-button type="success" @click="showChooseStu(item)" v-if="item.status==4">选择学生</el-button>
                             <el-button type="success" @click="showStu(item)" v-if="item.status==4">查看学生</el-button>
-                            <el-button type="info" @click="" v-if="item.status==3">审核不通过</el-button>
+                            <el-button type="info" @click="showUnPass(item)" v-if="item.status==3">审核不通过</el-button>
                             <el-button type="danger" @click="deleteProject(item)" v-if="item.status==3">删除</el-button>
                             <el-button type="info" @click="" v-if="item.status==2" >审核中</el-button>
                             <el-button type="warning" @click="cancel(item.pid)" v-if="item.status==2" >撤回</el-button>
@@ -176,7 +176,7 @@
 
                         </div>
                         <div  class="text item">
-                            联系电话:{{student.telephone}}<span v-if="student.telephone == null"> 未填写</span>
+                            联系电话:{{student.phone}}<span v-if="student.phone == null"> 未填写</span>
                         </div>
                         <div  class="text item">
                             电子邮箱:{{student.email}}<span v-if="student.email == null"> 未填写</span>
@@ -338,6 +338,11 @@
                 </el-table>
             </div>
         </el-dialog>
+
+        <!-- 查看审核不通过内容弹出框 -->
+        <el-dialog title="审核不通过" :visible.sync="unPassVisible" width="50%">
+            <div v-html="reject"></div>
+        </el-dialog>
     </div>
 </template>
 
@@ -354,6 +359,8 @@
         },
         data() {
             return {
+                reject:'',
+                unPassVisible:false,
                 getFileReq:{
                     type:'',
                     studentId:'',
@@ -555,6 +562,10 @@
 
         },
         methods: {
+            showUnPass(item){
+                this.reject = item.rejectContent
+                this.unPassVisible = true;
+            },
             //获取文档
             getFile(studentId,type,pdName){
                 if(type == "项目分工说明书"){
@@ -899,7 +910,32 @@
             //创建项目
             createAndPublishProject(){
                 this.project.status = 2
-                this.createProject
+                //保存文件
+                let myFile = this.$refs.myfile;
+                let files = myFile.files;
+                if (files.length != 0) {
+                    let file = files[0];
+                    let formData = new FormData();
+                    formData.append("file", file);
+                    formData.append("type", "15");
+                    formData.append("studentId", this.$cookies.get("mid"));
+                    this.$upload("/file", formData).then(resp => {
+                        this.$message.success(resp.message)
+                    })
+                }
+                //保存项目
+                console.log("ok")
+                this.project.teacherId = this.$cookies.get("mid");
+                this.$post("/project",this.project).then(res =>{
+                    if(res.resultCode === "0000") {
+                        this.reset();
+                        this.$message.success("创建项目成功");
+                        this.createVisible = false;
+                        this.loadData();
+                    }else{
+                        this.$message.success("创建项目失败");
+                    }
+                });
             },
             //选中学生
             chooseStudent(member){

@@ -6,6 +6,7 @@
             <i v-else class="el-icon-s-unfold"></i>
         </div>
         <div class="logo">综合实践系统</div>
+        <div class="text">当前项目流程为：{{step}}</div>
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 全屏显示 -->
@@ -41,15 +42,16 @@ import bus from '../common/bus';
 export default {
     data() {
         return {
+            step:'项目工程实践未开始',
             collapse: false,
             fullscreen: false,
-            name: 'linxin',
+            name: '用户名',
             message: 2
         };
     },
     computed: {
         username() {
-            let username = localStorage.getItem('ms_username');
+            let username = this.$cookies.get('username');
             return username ? username : this.name;
         }
     },
@@ -104,6 +106,42 @@ export default {
             this.fullscreen = !this.fullscreen;
         }
     },
+    created() {
+        this.$fetch("/time").then(
+            res => {
+                this.dateReq = res;
+                // * 时间类型
+                // * 1老师发布项目时间
+                // * 2学生第一次选择时间
+                // * 3老师第一次选择时间
+                // * 4学生第二次选择时间
+                // * 5老师第二次选择时间
+                // * 6老师第三次选择时间
+                // * 7项目最终提交时间
+                if (Date.parse(this.dateReq.publishStart) < new Date() && new Date() < Date.parse(this.dateReq.publishEnd)) {
+                    this.step = "老师发布项目时间"
+                }
+                if (Date.parse(this.dateReq.stuFirstChoiceStart) < new Date() && new Date() < Date.parse(this.dateReq.stuFirstChoiceEnd)) {
+                    this.step = "学生第一次选择时间"
+                }
+                if (Date.parse(this.dateReq.teacherFirstChoiceStart) < new Date() && new Date() < Date.parse(this.dateReq.teacherFirstChoiceEnd)) {
+                    this.step = "老师第一次选择时间"
+                }
+                if (Date.parse(this.dateReq.stuSecondChoiceStart) < new Date() && new Date() < Date.parse(this.dateReq.stuSecondChoiceEnd)) {
+                    this.step = "学生第二次选择时间"
+                }
+                if (Date.parse(this.dateReq.teacherSecondChoiceStart) < new Date() && new Date() < Date.parse(this.dateReq.teacherSecondChoiceEnd)) {
+                    this.step = "老师第二次选择时间"
+                }
+                if (Date.parse(this.dateReq.teacherThirdChoiceStart) < new Date() && new Date() < Date.parse(this.dateReq.teacherThirdChoiceEnd)) {
+                    this.step = "老师第三次选择时间"
+                }
+                if (Date.parse(this.dateReq.projectFinalStart) < new Date() && new Date() < Date.parse(this.dateReq.projectFinalEnd)) {
+                    this.step = "项目最终提交时间"
+                }
+            }
+        )
+    },
     mounted() {
         if (document.body.clientWidth < 1500) {
             this.collapseChage();
@@ -130,6 +168,12 @@ export default {
     float: left;
     width: 250px;
     line-height: 70px;
+}
+.text {
+    float: left;
+    width: 400px;
+    line-height: 110px;
+    font-size: large;
 }
 .header-right {
     float: right;
