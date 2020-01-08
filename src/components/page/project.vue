@@ -11,39 +11,42 @@
             <div style="padding: 8px">
                 <el-row>
                     是否满人：
-                    <el-select  v-model="ProjectReq.isFull" placeholder="请选择" style="padding: 10px">
-                        <el-option  label="已满人" value="1" ></el-option>
-                        <el-option  label="未满人" value="0"></el-option>
+                    <el-select v-model="ProjectReq.isFull" placeholder="请选择" style="padding: 10px">
+                        <el-option label="已满人" value="1"></el-option>
+                        <el-option label="未满人" value="0"></el-option>
                     </el-select>
 
-                    导师：<el-input v-model="ProjectReq.teacherNameLike" placeholder="导师名称" class="handle-input mr10"></el-input>
-                    项目名称：<el-input v-model="ProjectReq.pName" placeholder="项目名称" class="handle-input mr10"></el-input>
+                    导师：
+                    <el-input v-model="ProjectReq.teacherNameLike" placeholder="导师名称"
+                              class="handle-input mr10"></el-input>
+                    项目名称：
+                    <el-input v-model="ProjectReq.pName" placeholder="项目名称" class="handle-input mr10"></el-input>
                     <el-button type="primary" icon="el-icon-search" @click="searchProject">搜索</el-button>
                 </el-row>
             </div>
             <div style="height: 15px">
             </div>
-            <el-row >
-                <el-col :span="0.1" v-for="item in projects" style="padding: 8px">
-                    <el-card class="box-card" style="width: 280px;height: 270px">
+            <el-row>
+                <el-col :span="0.1" v-for="item in projects" class="flex-card" >
+                    <el-card class="box-card" style="min-width: 280px;min-height: 270px">
 
-                        <div slot="header" class="clearfix">
+                        <div slot="header" class="clearfix center-text">
                             <span>{{item.pname}}</span>&nbsp;
                         </div>
-                        <div  class="text item">
+                        <div class="text item center-text">
                             课题ID:{{item.pid}}
                         </div>
-                        <div  class="text item">
+                        <div class="text item center-text">
                             指导老师:{{item.teacherName}}
                         </div>
-                        <div  class="text item">
+                        <div class="text item center-text">
                             需求人数:{{item.member}}
                         </div>
-                        <div  class="text item">
+                        <div class="text item center-text">
                             入选人数:{{item.selected}}
                         </div>
-                        <div >
-                            <el-button type="primary" @click="showDetail(item.pid)" >详情</el-button>
+                        <div class="flex-around">
+                            <el-button type="primary" @click="showDetail(item.pid)">详情</el-button>
                             <el-button type="success" @click="showStu(item)">查看学生</el-button>
                             <el-button type="success" @click="showProjectDoc(item.pid)">文档管理</el-button>
                         </div>
@@ -96,7 +99,6 @@
         <!--                </el-form-item>-->
 
 
-
         <!--                <el-form-item>-->
         <!--                    <el-button type="primary" @click="onSubmit">提交志愿</el-button>-->
         <!--                    <el-button>重置</el-button>-->
@@ -105,11 +107,7 @@
         <!--            </div>-->
 
 
-
         <!--        </div>-->
-
-
-
 
 
         <!-- 编辑弹出框 -->
@@ -117,16 +115,16 @@
 
             <div style="width: 400px">
                 <el-form ref="form" :model="projectDemo" label-width="80px" style="padding: 30px;font-size:large">
-                    <div class="user-info-list" >
+                    <div class="user-info-list">
                         课题id&emsp;&nbsp;：&emsp;&emsp;<span>{{projectDemo.pid}}</span>
                     </div>
-                    <div class="user-info-list" >
+                    <div class="user-info-list">
                         项目名称：&emsp;&emsp;<span>{{projectDemo.pname}}</span>
                     </div>
-                    <div class="user-info-list" >
+                    <div class="user-info-list">
                         指导老师：&emsp;&emsp;<span>{{projectDemo.teacherName}}</span>
                     </div>
-                    <div class="user-info-list" >
+                    <div class="user-info-list">
                         需求人数：&emsp;&emsp;<span>{{projectDemo.member}}</span>
                     </div>
 
@@ -142,35 +140,35 @@
         <!-- 查看学生弹出框 -->
         <el-dialog title="已选择学生" :visible.sync="seeVisible" width="90%">
 
-            <el-row >
+            <el-row>
                 <h1 align="center">综合实践管理系统</h1>
             </el-row>
             <el-row>
                 <h2 align="center" v-if="students.length <1">暂无学生入选 </h2>
                 <el-col :span="4.6" v-for="student in students" style="padding: 8px">
                     <el-card class="box-card" style="width: 290px;height: 400px">
-                        <div slot="header" >
+                        <div slot="header">
                             <span>{{student.name}}</span>
                         </div>
-                        <div  class="text item">
+                        <div class="text item">
                             年级:{{student.grade}}
                         </div>
-                        <div  class="text item">
+                        <div class="text item">
                             学院:{{student.college}}
                         </div>
-                        <div  class="text item">
+                        <div class="text item">
                             专业:{{student.major}}
                         </div>
-                        <div  class="text item">
+                        <div class="text item">
                             班级:{{student.classes}}
                         </div>
-                        <div  class="text item">
+                        <div class="text item">
                             联系地址:{{student.address}}<span v-if="student.address == null"> 未填写</span>
                         </div>
-                        <div  class="text item">
+                        <div class="text item">
                             联系电话:{{student.telephone}}<span v-if="student.telephone == null"> 未填写</span>
                         </div>
-                        <div  class="text item">
+                        <div class="text item">
                             电子邮箱:{{student.email}}<span v-if="student.email == null"> 未填写</span>
                         </div>
                     </el-card>
@@ -182,7 +180,7 @@
 
         <!--确认学生-->
         <el-dialog title="文档管理" :visible.sync="docVisible" width="60%" align="center">
-            <div style="width: 900px" >
+            <div style="width: 900px">
                 <el-table
                         :data="fileList"
                         border
@@ -201,7 +199,8 @@
                                     @click="getFile(scope.row.studentId,scope.row.type,scope.row.pdName)"
                                     type="text"
                                     icon="el-icon-document"
-                            >下载</el-button>
+                            >下载
+                            </el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -215,87 +214,88 @@
     import 'quill/dist/quill.core.css';
     import 'quill/dist/quill.snow.css';
     import 'quill/dist/quill.bubble.css';
-    import { quillEditor } from 'vue-quill-editor';
+    import {quillEditor} from 'vue-quill-editor';
+
     export default {
         name: 'basetable',
         data() {
 
             return {
-                getFileReq:{
-                  type:'',
-                  studentId:'',
+                getFileReq: {
+                    type: '',
+                    studentId: '',
                 },
-                docVisible:false,
+                docVisible: false,
                 fileList: [],
                 //文档请求参数
-                fileListReq:{
-                    pid:'',
+                fileListReq: {
+                    pid: '',
                 },
-                seeVisible:false,
-                students:[],
-                showStuReq:{
-                    pId:'',
+                seeVisible: false,
+                students: [],
+                showStuReq: {
+                    pId: '',
                 },
-                page:{
-                    pages:1,
-                    total:1,
+                page: {
+                    pages: 1,
+                    total: 1,
                 },
-                editorOption:{
+                editorOption: {
                     placeholder: '驳回原因'
                 },
-                ProjectReq:{
-                    pid:'',
-                    status:'4',
-                    teacherid:'',
-                    rejectContent:'',
-                    pName:'',
+                ProjectReq: {
+                    pid: '',
+                    status: '4',
+                    teacherid: '',
+                    rejectContent: '',
+                    pName: '',
                     size: 10,
                     current: 1,
-                    isFull:"0",
-                    teacherNameLike:'',
+                    isFull: "0",
+                    teacherNameLike: '',
                 },
-                ProjectRequest:{
+                ProjectRequest: {
                     pid: '',
-                    status:'',
-                    teacherid:'',
-                    rejectContent:'',
-                    pName:'',
+                    status: '',
+                    teacherid: '',
+                    rejectContent: '',
+                    pName: '',
                 },
-                radio1:'未审核',
-                projectDemo:{
-                    pid:'',
-                    teacherid:'',
-                    pname:'',
-                    teacherName:'',
-                    content:'',
-                    member:'',
-                    file:'',
-                    status:'',
-                    isFull:'',
-                    selected:'',
-                    first:'',
-                    second:'',
-                    third:'',
+                radio1: '未审核',
+                projectDemo: {
+                    pid: '',
+                    teacherid: '',
+                    pname: '',
+                    teacherName: '',
+                    content: '',
+                    member: '',
+                    file: '',
+                    status: '',
+                    isFull: '',
+                    selected: '',
+                    first: '',
+                    second: '',
+                    third: '',
                 },
                 rejectVisible: false,
                 detailVisible: false,
-                formLabelWidth:'80px',
+                formLabelWidth: '80px',
 
-                projects:[
+                projects: [
                     {
-                        pid:'123',
-                        teacherid:'123',
-                        pname:'123',
-                        teacherName:'123',
-                        content:'123',
-                        member:'123',
-                        file:'123',
-                        status:'1',
-                        isFull:'1',
-                        selected:'123',
-                        first:'123',
-                        second:'123',
-                        third:'123',
+                        pid: '123',
+                        teacherid: '123',
+                        pname: '123',
+                        teacherName: '123',
+                        content: '123',
+                        member: '123',
+                        file: '123',
+                        status: '1',
+                        isFull: '1',
+                        selected: '123',
+                        first: '123',
+                        second: '123',
+                        third: '123',
                     }
                 ],
                 query: {
@@ -333,39 +333,39 @@
         },
         methods: {
             //获取文档
-            getFile(studentId,type,pdName){
-                if(type == "项目分工说明书"){
+            getFile(studentId, type, pdName) {
+                if (type == "项目分工说明书") {
                     type = 1
-                }else if(type == "项目规划说明书"){
+                } else if (type == "项目规划说明书") {
                     type = 2
-                }else if(type == "需求分析说明书"){
+                } else if (type == "需求分析说明书") {
                     type = 3
-                }else if(type == "概要设计说明书"){
+                } else if (type == "概要设计说明书") {
                     type = 4
-                }else if(type == "详细设计说明书"){
+                } else if (type == "详细设计说明书") {
                     type = 5
-                }else if(type == "系统测试报告"){
+                } else if (type == "系统测试报告") {
                     type = 6
-                }else if(type == "推广实施说明书"){
+                } else if (type == "推广实施说明书") {
                     type = 7
-                }else if(type == "资金预算表"){
+                } else if (type == "资金预算表") {
                     type = 8
-                }else if(type == "资金执行计划表"){
+                } else if (type == "资金执行计划表") {
                     type = 9
-                }else if(type == "用户手册"){
+                } else if (type == "用户手册") {
                     type = 10
-                }else if(type == "工作周志"){
+                } else if (type == "工作周志") {
                     type = 11
-                }else if(type == "项目工程实践报告"){
+                } else if (type == "项目工程实践报告") {
                     type = 12
-                }else if(type == "项目工程实践成果登记表"){
+                } else if (type == "项目工程实践成果登记表") {
                     type = 13
-                }else if(type == "讲座听后感"){
+                } else if (type == "讲座听后感") {
                     type = 14
                 }
                 this.getFileReq.type = type
                 this.getFileReq.studentId = studentId
-                this.$getFile("/file",this.getFileReq).then(res=>{
+                this.$getFile("/file", this.getFileReq).then(res => {
                     let url = window.URL.createObjectURL(res.data); //表示一个指定的file对象或Blob对象
                     let a = document.createElement("a");
                     document.body.appendChild(a);
@@ -377,38 +377,38 @@
                 })
             },
             //查看文档
-            showProjectDoc(pid){
+            showProjectDoc(pid) {
                 this.fileListReq.pid = pid;
-                this.$fetch("/file/lists",this.fileListReq).then(res =>{
+                this.$fetch("/file/lists", this.fileListReq).then(res => {
                     this.fileList = res;
-                    this.fileList.forEach(doc=>{
-                        if(doc.type == 1){
+                    this.fileList.forEach(doc => {
+                        if (doc.type == 1) {
                             doc.type = "项目分工说明书";
-                        }else if(doc.type == 2){
+                        } else if (doc.type == 2) {
                             doc.type = "项目规划说明书";
-                        }else if(doc.type == 3){
+                        } else if (doc.type == 3) {
                             doc.type = "需求分析说明书";
-                        }else if(doc.type == 4){
+                        } else if (doc.type == 4) {
                             doc.type = "概要设计说明书";
-                        }else if(doc.type == 5){
+                        } else if (doc.type == 5) {
                             doc.type = "详细设计说明书";
-                        }else if(doc.type == 6){
+                        } else if (doc.type == 6) {
                             doc.type = "系统测试报告";
-                        }else if(doc.type == 7){
+                        } else if (doc.type == 7) {
                             doc.type = "推广实施说明书";
-                        }else if(doc.type == 8){
+                        } else if (doc.type == 8) {
                             doc.type = "资金预算表";
-                        }else if(doc.type == 9){
+                        } else if (doc.type == 9) {
                             doc.type = "资金执行计划表";
-                        }else if(doc.type == 10){
+                        } else if (doc.type == 10) {
                             doc.type = "用户手册";
-                        }else if(doc.type == 11){
+                        } else if (doc.type == 11) {
                             doc.type = "工作周志";
-                        }else if(doc.type == 12){
+                        } else if (doc.type == 12) {
                             doc.type = "项目工程实践报告";
-                        }else if(doc.type == 13){
+                        } else if (doc.type == 13) {
                             doc.type = "项目工程实践成果登记表";
-                        }else if(doc.type == 14){
+                        } else if (doc.type == 14) {
                             doc.type = "讲座听后感";
                         }
                     })
@@ -416,66 +416,66 @@
                 })
             },
             //查看已选学生信息
-            showStu(project){
+            showStu(project) {
                 this.showStuReq.pId = project.pid;
-                this.$fetch("/project/students",this.showStuReq).then(res=>{
+                this.$fetch("/project/students", this.showStuReq).then(res => {
                     this.students = res;
-                    this.seeVisible=true
+                    this.seeVisible = true
                 })
 
             },
             //查找项目 模糊查询
-            searchProject(){
+            searchProject() {
                 this.initPage();
                 // 变化后的回调函数，这里我们再次调用getDataFromServer即可
                 this.getData();
             },
             //初始化分页条件
-            initPage(){
-                this.ProjectReq.current=1;
-                this.page.pages=1;
-                this.page.total=0;
+            initPage() {
+                this.ProjectReq.current = 1;
+                this.page.pages = 1;
+                this.page.total = 0;
             },
             //页面改变事件
-            currentChange(val){
+            currentChange(val) {
                 this.ProjectReq.current = val;
                 this.getData();
             },
             //页面大小改变事件
-            sizeChange(val){
+            sizeChange(val) {
                 this.ProjectReq.size = val;
                 this.getData();
             },
             //审核通过
-            passProject(item){
+            passProject(item) {
                 this.ProjectRequest.pid = item.pid;
                 this.ProjectRequest.status = 4;
-                this.$patch("/project",this.ProjectRequest).then(res=>{
+                this.$patch("/project", this.ProjectRequest).then(res => {
                     this.$message.success("项目审核通过")
                     Object.keys(this.projects).forEach(key => {
-                        if(this.projects[key].pid === item.pid){
+                        if (this.projects[key].pid === item.pid) {
                             this.projects[key].status = 4;
                         }
                     });
                 })
             },
             //弹窗驳回窗口
-            showReject(item){
+            showReject(item) {
                 Object.keys(this.projects).forEach(key => {
-                    if(this.projects[key].pid === item.pid){
+                    if (this.projects[key].pid === item.pid) {
                         this.projectDemo = this.projects[key];
                     }
                 });
-                this.rejectVisible=true
+                this.rejectVisible = true
             },
             //驳回项目
-            rejectProject(pid){
+            rejectProject(pid) {
                 this.ProjectRequest.pid = pid;
-                this.ProjectRequest.status = 3 ;
-                this.$patch("/project",this.ProjectRequest).then(res=>{
+                this.ProjectRequest.status = 3;
+                this.$patch("/project", this.ProjectRequest).then(res => {
                     this.$message.success("已驳回项目");
                     Object.keys(this.projects).forEach(key => {
-                        if(this.projects[key].pid === pid){
+                        if (this.projects[key].pid === pid) {
                             this.projects[key].status = 3;
                         }
                     });
@@ -483,17 +483,17 @@
                 })
             },
             //查看项目详情
-            showDetail(id){
+            showDetail(id) {
                 Object.keys(this.projects).forEach(key => {
-                    if(this.projects[key].pid === id){
+                    if (this.projects[key].pid === id) {
                         this.projectDemo = this.projects[key];
                     }
                 });
-                this.detailVisible=true
+                this.detailVisible = true
             },
             //获取数据
-            getData(){
-                this.$fetch("/project",this.ProjectReq).then(res=>{
+            getData() {
+                this.$fetch("/project", this.ProjectReq).then(res => {
                     this.projects = res.records;
                     this.page.total = res.total;
                     this.page.pages = res.pages;
@@ -569,11 +569,31 @@
         margin-bottom: 18px;
     }
 
+    .flex-around{
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .center-text {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .flex-card{
+        padding: 8px;
+        margin-bottom:2%;
+        width: 33%;
+        display: flex;
+        justify-content: center;
+    }
+
     .clearfix:before,
     .clearfix:after {
         display: table;
         content: "";
     }
+
     .clearfix:after {
         clear: both
     }
@@ -581,7 +601,6 @@
     .box-card {
         width: 240px;
     }
-
 
 
     .handle-box {
@@ -596,16 +615,20 @@
         width: 300px;
         display: inline-block;
     }
+
     .table {
         width: 100%;
         font-size: 14px;
     }
+
     .red {
         color: #ff0000;
     }
+
     .mr10 {
         margin-right: 10px;
     }
+
     .table-td-thumb {
         display: block;
         margin: auto;
