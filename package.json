@@ -14,7 +14,7 @@
     "element-ui": "^2.11.0",
     "js-sha256": "^0.9.0",
     "mavon-editor": "^2.6.17",
-    "qs": "^6.9.1",
+    "qs": "^6.9.7",
     "vue": "^2.6.10",
     "vue-cookies": "^1.5.13",
     "vue-cropperjs": "^3.0.0",
